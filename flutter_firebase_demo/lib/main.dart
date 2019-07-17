@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_demo/baby/add_baby.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,6 +27,16 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(title: Text('Baby Name Votes')),
       body: _buildBody(context),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          debugPrint("Add button clicked!");
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return Baby();
+          }));
+        },
+        child: Icon(Icons.add),
+        tooltip: "Add More Item",
+      ),
     );
   }
 
