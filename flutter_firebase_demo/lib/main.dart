@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/baby/add_baby.dart';
+import 'package:flutter_firebase_demo/route/route.dart';
 import 'package:flutter_firebase_demo/user/user.dart';
 
 void main() => runApp(MyApp());
@@ -26,13 +27,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('User Information')),
+      appBar: AppBar(title: Text('Route Information')),
       body: _buildBody(context),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint("Add button clicked!");
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return UserOperation();
+            return RouteOperation();
           }));
         },
         child: Icon(Icons.add),
@@ -43,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('User').snapshots(),
+      stream: Firestore.instance.collection('Route').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return LinearProgressIndicator();
 
@@ -61,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
     try {
-      final record = User.fromSnapshot(data);
+      final record = Route.fromSnapshot(data);
 
       return Padding(
         key: ValueKey(record.id),
@@ -72,10 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
             borderRadius: BorderRadius.circular(5.0),
           ),
           child: ListTile(
-            title: Text(record.fullName),
-            trailing: Text(record.userType.toString()),
-            subtitle: Text(
-                record.email.toString() + ", " + record.phoneNo.toString()),
+            title: Text(record.id.toString()),
+            trailing: Text(record.place.toString()),
             onTap: () => Firestore.instance.runTransaction((transaction) async {
                   final freshSnapshot = await transaction.get(record.reference);
                   final fresh = Record.fromSnapshot(freshSnapshot);
@@ -166,20 +165,20 @@ class Bus {
 
 class Route {
   int id;
-  String route;
+  String place;
   final DocumentReference reference;
 
   Route.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map['id'] != null),
-        assert(map['route'] != null),
+        assert(map['place'] != null),
         id = map['id'],
-        route = map['route'];
+        place = map['place'];
 
   Route.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
 
   @override
-  String toString() => "Record<$id:$route>";
+  String toString() => "Record<$id:$place>";
 }
 
 class Book {
