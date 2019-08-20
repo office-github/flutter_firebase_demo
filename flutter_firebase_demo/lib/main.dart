@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/baby/add_baby.dart';
+import 'package:flutter_firebase_demo/user/user.dart';
 
 void main() => runApp(MyApp());
 
@@ -25,13 +26,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Baby Name Votes')),
+      appBar: AppBar(title: Text('User Information')),
       body: _buildBody(context),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint("Add button clicked!");
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return Baby();
+            return UserOperation();
           }));
         },
         child: Icon(Icons.add),
@@ -42,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('baby').snapshots(),
+      stream: Firestore.instance.collection('User').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return LinearProgressIndicator();
 
@@ -59,29 +60,35 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
-    final record = Record.fromSnapshot(data);
+    try {
+      final record = User.fromSnapshot(data);
 
-    return Padding(
-      key: ValueKey(record.name),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        child: ListTile(
-          title: Text(record.name),
-          trailing: Text(record.votes.toString()),
-          onTap: () => Firestore.instance.runTransaction((transaction) async {
-            final freshSnapshot = await transaction.get(record.reference);
-            final fresh = Record.fromSnapshot(freshSnapshot);
+      return Padding(
+        key: ValueKey(record.id),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(5.0),
+          ),
+          child: ListTile(
+            title: Text(record.fullName),
+            trailing: Text(record.userType.toString()),
+            subtitle: Text(
+                record.email.toString() + ", " + record.phoneNo.toString()),
+            onTap: () => Firestore.instance.runTransaction((transaction) async {
+                  final freshSnapshot = await transaction.get(record.reference);
+                  final fresh = Record.fromSnapshot(freshSnapshot);
 
-            await transaction
-                .update(record.reference, {'votes': fresh.votes + 1});
-          }),
+                  // await transaction
+                  //     .update(record.reference, {'votes': fresh.votes + 1});
+                }),
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      debugPrint(e);
+    }
   }
 }
 
@@ -101,4 +108,112 @@ class Record {
 
   @override
   String toString() => "Record<$name:$votes>";
+}
+
+class User {
+  final int id;
+  final String userType;
+  final String fullName;
+  final String email;
+  final int phoneNo;
+  final String password;
+  final DocumentReference reference;
+
+  User.fromMap(Map<String, dynamic> map, {this.reference})
+      : assert(map['id'] != null),
+        assert(map['userType'] != null),
+        assert(map['fullName'] != null),
+        assert(map['email'] != null),
+        assert(map['phoneNo'] != null),
+        assert(map['password'] != null),
+        id = map['id'],
+        userType = map['userType'],
+        fullName = map['fullName'],
+        email = map['email'],
+        phoneNo = map['phoneNo'],
+        password = map['password'];
+
+  User.fromSnapshot(DocumentSnapshot snapshot)
+      : this.fromMap(snapshot.data, reference: snapshot.reference);
+
+  @override
+  String toString() => "User<$id:$fullName>";
+}
+
+class Bus {
+  int id;
+  String number; //Unique
+  String owner; //Company or owner person
+  String routes; //Comma separated values of strings
+  final DocumentReference reference;
+
+  Bus.fromMap(Map<String, dynamic> map, {this.reference})
+      : assert(map['id'] != null),
+        assert(map['number'] != null),
+        assert(map['owner'] != null),
+        assert(map['routes'] != null),
+        id = map['id'],
+        number = map['number'],
+        owner = map['owner'],
+        routes = map['routes'];
+
+  Bus.fromSnapshot(DocumentSnapshot snapshot)
+      : this.fromMap(snapshot.data, reference: snapshot.reference);
+
+  @override
+  String toString() => "User<$id:$number>";
+}
+
+class Route {
+  int id;
+  String route;
+  final DocumentReference reference;
+
+  Route.fromMap(Map<String, dynamic> map, {this.reference})
+      : assert(map['id'] != null),
+        assert(map['route'] != null),
+        id = map['id'],
+        route = map['route'];
+
+  Route.fromSnapshot(DocumentSnapshot snapshot)
+      : this.fromMap(snapshot.data, reference: snapshot.reference);
+
+  @override
+  String toString() => "Record<$id:$route>";
+}
+
+class Book {
+  int id;
+  int userId;
+  int busId;
+  String source;
+  String destination;
+  double fair;
+  double discount; //Percentage
+  double totalFair; //After discount
+  final DocumentReference reference;
+
+  Book.fromMap(Map<String, dynamic> map, {this.reference})
+      : assert(map['id'] != null),
+        assert(map['userId'] != null),
+        assert(map['busId'] != null),
+        assert(map['source'] != null),
+        assert(map['destination'] != null),
+        assert(map['fair'] != null),
+        assert(map['discount'] != null),
+        assert(map['fair'] != null),
+        id = map['id'],
+        userId = map['userId'],
+        busId = map['busId'],
+        source = map['source'],
+        destination = map['destination'],
+        fair = map['fair'],
+        discount = map['discount'],
+        totalFair = map['totalFair'];
+
+  Book.fromSnapshot(DocumentSnapshot snapshot)
+      : this.fromMap(snapshot.data, reference: snapshot.reference);
+
+  @override
+  String toString() => "User<$id:$userId:$busId>";
 }
