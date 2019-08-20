@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/baby/add_baby.dart';
+import 'package:flutter_firebase_demo/bus/bus.dart';
 import 'package:flutter_firebase_demo/route/route.dart';
 import 'package:flutter_firebase_demo/user/user.dart';
 
@@ -33,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () {
           debugPrint("Add button clicked!");
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return RouteOperation();
+            return BusOperation();
           }));
         },
         child: Icon(Icons.add),
@@ -44,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('Route').snapshots(),
+      stream: Firestore.instance.collection('Bus').snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return LinearProgressIndicator();
 
@@ -62,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
     try {
-      final record = Route.fromSnapshot(data);
+      final record = Bus.fromSnapshot(data);
 
       return Padding(
         key: ValueKey(record.id),
@@ -73,8 +74,9 @@ class _MyHomePageState extends State<MyHomePage> {
             borderRadius: BorderRadius.circular(5.0),
           ),
           child: ListTile(
-            title: Text(record.id.toString()),
-            trailing: Text(record.place.toString()),
+            title: Text(record.id.toString() + ", " + record.owner),
+            trailing: Text(record.number),
+            subtitle: Text(record.routes),
             onTap: () => Firestore.instance.runTransaction((transaction) async {
                   final freshSnapshot = await transaction.get(record.reference);
                   final fresh = Record.fromSnapshot(freshSnapshot);
