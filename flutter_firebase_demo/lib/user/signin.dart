@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_demo/user/UserType.dart';
 import 'package:flutter_firebase_demo/user/register.dart';
 
 class SignIn extends StatefulWidget {
@@ -99,7 +100,7 @@ class _SignInState extends State<SignIn> {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         debugPrint("Signed In Successfully.");
         return Register(
-          userType: users.documents[0].data["userType"],
+          userType: users.documents[0].data[UserType.text],
         );
       }));
     }

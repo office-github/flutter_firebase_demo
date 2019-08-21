@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_demo/user/UserType.dart';
 
 class Register extends StatefulWidget {
-  final String userType;
+  String userType = UserType.user;
 
   Register({this.userType});
 
@@ -12,7 +13,6 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController idController = TextEditingController();
   TextEditingController userTypeController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -20,6 +20,7 @@ class _RegisterState extends State<Register> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController repassWordController = TextEditingController();
   final String userType;
+  bool validateForm = true;
 
   _RegisterState(this.userType);
 
@@ -45,7 +46,7 @@ class _RegisterState extends State<Register> {
   Widget getForm(userType) {
     return Form(
       key: _formKey,
-      autovalidate: true,
+      autovalidate: validateForm,
       child: Padding(
         padding: EdgeInsets.all(10.0),
         child: ListView(
@@ -56,24 +57,59 @@ class _RegisterState extends State<Register> {
   }
 
 //Add record to the firebase database.
-  void register() {
-    int id = int.parse(idController.text.trim());
-    String userType =
-        userTypeController.text.isEmpty || userTypeController.text == null
-            ? "user"
-            : userTypeController.text;
+  void register() async {
+    String userType = userTypeController.text == null ||
+            userTypeController.text.trim().isEmpty
+        ? UserType.user
+        : userTypeController.text;
     String fullName = fullNameController.text.trim();
     String email = emailController.text.trim();
     int phoneNo = int.parse(phoneNoController.text.trim());
     String password = passwordController.text.trim();
 
-    debugPrint("Name: $id, UserType: $userType");
+    debugPrint("Email: $email, Phone No.: $phoneNo");
 
+    String message = await isUserAlreadyExists(email, phoneNo);
+
+    if (message != null) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Already Exists'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[Text(message)],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
 //Get the firebase database collection refrence of the baby collection.
     CollectionReference reference = Firestore.instance.collection('User');
+    final userAvailable =
+        await reference.orderBy("id", descending: true).getDocuments();
+    int newId = 1;
+
+    if (userAvailable.documents.length > 0) {
+      final lastUser = userAvailable.documents[0].data;
+      newId = lastUser["id"] + 1;
+    }
+
     Map<String, dynamic> map = new Map();
     map.addAll({
-      "id": id,
+      "id": newId,
       "userType": userType,
       "fullName": fullName,
       "email": email,
@@ -81,36 +117,12 @@ class _RegisterState extends State<Register> {
       "password": password
     });
 
-    reference.add(map);
+    await reference.add(map);
     debugPrint("Saved Successfully.");
   }
 
   void back(BuildContext context) {
     Navigator.pop(context);
-  }
-
-  getIdTextField() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      style: TextStyle(fontStyle: FontStyle.normal, fontSize: 14.0),
-      controller: idController,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return "Id Required";
-        }
-      },
-      decoration: InputDecoration(
-          labelText: "Id",
-          hintText: "Please Enter Id",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-      onEditingComplete: () {
-        setState(() {
-          if (_formKey.currentState.validate()) {
-            print("Valid");
-          }
-        });
-      },
-    );
   }
 
   getUserTypeDropDown() {
@@ -155,6 +167,9 @@ class _RegisterState extends State<Register> {
       validator: (String value) {
         if (value.isEmpty) {
           return "Email Required";
+        } else if (!RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+            .hasMatch(value)) {
+          return "Enter Valid Email";
         }
       },
       decoration: InputDecoration(
@@ -174,6 +189,8 @@ class _RegisterState extends State<Register> {
       validator: (String value) {
         if (value.isEmpty) {
           return "Phone No. Required";
+        } else if (value.length != 10) {
+          return "Invalid Phone Number";
         }
       },
       decoration: InputDecoration(
@@ -243,11 +260,8 @@ class _RegisterState extends State<Register> {
   }
 
   List<Widget> getRegisterWidget(userType) {
-    if (userType == "admin") {
+    if (userType == UserType.admin) {
       return [
-        Padding(
-            padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-            child: getIdTextField()),
         Padding(
             padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
             child: getUserTypeDropDown()),
@@ -273,9 +287,6 @@ class _RegisterState extends State<Register> {
     return [
       Padding(
           padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-          child: getIdTextField()),
-      Padding(
-          padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
           child: getFulNameTextField()),
       Padding(
           padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
@@ -291,5 +302,41 @@ class _RegisterState extends State<Register> {
           child: getRePasswordTextField()),
       getRegisterButton()
     ];
+  }
+
+  Future<String> isUserAlreadyExists(String email, int phoneNo) async {
+    bool emailExist = await Firestore.instance
+        .collection('User')
+        .where("email", isEqualTo: email)
+        .getDocuments()
+        .then((snapshot) {
+      if (snapshot.documents.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+    bool phoneNoExist = await Firestore.instance
+        .collection('User')
+        .where("phoneNo", isEqualTo: phoneNo)
+        .getDocuments()
+        .then((snapshot) {
+      if (snapshot.documents.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+    if (emailExist && phoneNoExist) {
+      return "Email and Phone No. Already Exists";
+    } else if (emailExist) {
+      return "Email Already Exists";
+    } else if (phoneNoExist) {
+      return "Phone No. Already Exists";
+    }
+
+    return null;
   }
 }
