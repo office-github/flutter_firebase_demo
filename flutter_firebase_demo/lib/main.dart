@@ -4,17 +4,15 @@ import 'package:flutter_firebase_demo/baby/add_baby.dart';
 import 'package:flutter_firebase_demo/book/book.dart';
 import 'package:flutter_firebase_demo/bus/bus.dart';
 import 'package:flutter_firebase_demo/route/route.dart';
-import 'package:flutter_firebase_demo/user/user.dart';
+import 'package:flutter_firebase_demo/user/signin.dart';
+import 'package:flutter_firebase_demo/user/register.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Baby Names',
-      home: MyHomePage(),
-    );
+    return MaterialApp(home: MyHomePage());
   }
 }
 
@@ -29,13 +27,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Book Information')),
+      appBar: AppBar(title: Text('User Information')),
       body: _buildBody(context),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint("Add button clicked!");
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return BookOperation();
+            return SignIn();
           }));
         },
         child: Icon(Icons.add),
@@ -46,9 +44,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('Book').snapshots(),
+      stream: Firestore.instance.collection('User').snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return LinearProgressIndicator();
+        if (!snapshot.hasData) return CircularProgressIndicator();
 
         return _buildList(context, snapshot.data.documents);
       },
@@ -64,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
     try {
-      final record = Book.fromSnapshot(data);
+      final record = User.fromSnapshot(data);
 
       return Padding(
         key: ValueKey(record.id),
@@ -75,15 +73,15 @@ class _MyHomePageState extends State<MyHomePage> {
             borderRadius: BorderRadius.circular(5.0),
           ),
           child: ListTile(
-            title: Text(record.source),
-            trailing: Text(record.destination),
-            onTap: () => Firestore.instance.runTransaction((transaction) async {
-                  final freshSnapshot = await transaction.get(record.reference);
-                  final fresh = Record.fromSnapshot(freshSnapshot);
+            title: Text(record.email),
+            trailing: Text(record.password),
+            // onTap: () => Firestore.instance.runTransaction((transaction) async {
+            //       final freshSnapshot = await transaction.get(record.reference);
+            //       final fresh = Record.fromSnapshot(freshSnapshot);
 
-                  // await transaction
-                  //     .update(record.reference, {'votes': fresh.votes + 1});
-                }),
+            //       await transaction
+            //           .update(record.reference, {'votes': fresh.votes + 1});
+            //     }),
           ),
         ),
       );

@@ -1,12 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class UserOperation extends StatefulWidget {
+class Register extends StatefulWidget {
+  final String userType;
+
+  Register({this.userType});
+
   @override
-  State<StatefulWidget> createState() => _UserState();
+  State<StatefulWidget> createState() => _RegisterState(this.userType);
 }
 
-class _UserState extends State<UserOperation> {
+class _RegisterState extends State<Register> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController idController = TextEditingController();
   TextEditingController userTypeController = TextEditingController();
@@ -15,6 +19,9 @@ class _UserState extends State<UserOperation> {
   TextEditingController phoneNoController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController repassWordController = TextEditingController();
+  final String userType;
+
+  _RegisterState(this.userType);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +31,7 @@ class _UserState extends State<UserOperation> {
         },
         child: Scaffold(
             appBar: AppBar(
-              title: Text("Add User Information"),
+              title: Text("Registration"),
               leading: IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () {
@@ -32,72 +39,35 @@ class _UserState extends State<UserOperation> {
                 },
               ),
             ),
-            body: getForm()));
+            body: getForm(this.userType)));
   }
 
-  Widget getForm() {
+  Widget getForm(userType) {
     return Form(
       key: _formKey,
       autovalidate: true,
       child: Padding(
         padding: EdgeInsets.all(10.0),
         child: ListView(
-          children: <Widget>[
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getIdTextField()),
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getUserTypeDropDown()),
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getFulNameTextField()),
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getEmailTextField()),
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getPhoneNoTextField()),
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getPasswordTextField()),
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getRePasswordTextField()),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 10.0, bottom: 10.0, left: 50.0, right: 50.0),
-              child: RaisedButton(
-                child: Text(
-                  "Save",
-                  textScaleFactor: 1.5,
-                ),
-                onPressed: () {
-                  setState(() {
-                    if (_formKey.currentState.validate()) {
-                      debugPrint("Add Clicked");
-                      save();
-                    }
-                  });
-                },
-              ),
-            )
-          ],
+          children: getRegisterWidget(userType),
         ),
       ),
     );
   }
 
 //Add record to the firebase database.
-  void save() {
-    int id = int.parse(idController.text);
-    String userType = userTypeController.text;
-    String fullName = fullNameController.text;
-    String email = emailController.text;
-    int phoneNo = int.parse(phoneNoController.text);
-    String password = passwordController.text;
+  void register() {
+    int id = int.parse(idController.text.trim());
+    String userType =
+        userTypeController.text.isEmpty || userTypeController.text == null
+            ? "user"
+            : userTypeController.text;
+    String fullName = fullNameController.text.trim();
+    String email = emailController.text.trim();
+    int phoneNo = int.parse(phoneNoController.text.trim());
+    String password = passwordController.text.trim();
 
-    debugPrint("Name: $id, Vote: $userType");
+    debugPrint("Name: $id, UserType: $userType");
 
 //Get the firebase database collection refrence of the baby collection.
     CollectionReference reference = Firestore.instance.collection('User');
@@ -249,5 +219,77 @@ class _UserState extends State<UserOperation> {
           hintText: "Please Enter Re-Password",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
     );
+  }
+
+  getRegisterButton() {
+    return Padding(
+      padding:
+          EdgeInsets.only(top: 10.0, bottom: 10.0, left: 50.0, right: 50.0),
+      child: RaisedButton(
+        child: Text(
+          "Register",
+          textScaleFactor: 1.5,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_formKey.currentState.validate()) {
+              debugPrint("Register Clicked");
+              register();
+            }
+          });
+        },
+      ),
+    );
+  }
+
+  List<Widget> getRegisterWidget(userType) {
+    if (userType == "admin") {
+      return [
+        Padding(
+            padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: getIdTextField()),
+        Padding(
+            padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: getUserTypeDropDown()),
+        Padding(
+            padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: getFulNameTextField()),
+        Padding(
+            padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: getEmailTextField()),
+        Padding(
+            padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: getPhoneNoTextField()),
+        Padding(
+            padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: getPasswordTextField()),
+        Padding(
+            padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: getRePasswordTextField()),
+        getRegisterButton()
+      ];
+    }
+
+    return [
+      Padding(
+          padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+          child: getIdTextField()),
+      Padding(
+          padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+          child: getFulNameTextField()),
+      Padding(
+          padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+          child: getEmailTextField()),
+      Padding(
+          padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+          child: getPhoneNoTextField()),
+      Padding(
+          padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+          child: getPasswordTextField()),
+      Padding(
+          padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+          child: getRePasswordTextField()),
+      getRegisterButton()
+    ];
   }
 }
