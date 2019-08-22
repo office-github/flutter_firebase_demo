@@ -23,17 +23,7 @@ class _BookState extends State<BookOperation> {
         onWillPop: () {
           back(context);
         },
-        child: Scaffold(
-            appBar: AppBar(
-              title: Text("Add User Information"),
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () {
-                  back(context);
-                },
-              ),
-            ),
-            body: getForm()));
+        child: Scaffold(body: getForm()));
   }
 
   Widget getForm() {
@@ -73,14 +63,14 @@ class _BookState extends State<BookOperation> {
                   top: 10.0, bottom: 10.0, left: 50.0, right: 50.0),
               child: RaisedButton(
                 child: Text(
-                  "Save",
+                  "Pay",
                   textScaleFactor: 1.5,
                 ),
                 onPressed: () {
                   setState(() {
                     if (_formKey.currentState.validate()) {
-                      debugPrint("Add Clicked");
-                      save();
+                      debugPrint("Pay Clicked");
+                      payFair();
                     }
                   });
                 },
@@ -93,7 +83,7 @@ class _BookState extends State<BookOperation> {
   }
 
 //Add record to the firebase database.
-  void save() {
+  void payFair() {
     int id = int.parse(idController.text);
     int userId = int.parse(userIdController.text);
     int busId = int.parse(busIdController.text);

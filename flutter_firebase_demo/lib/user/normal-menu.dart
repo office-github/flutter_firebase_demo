@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/book/book.dart';
 import 'package:flutter_firebase_demo/bus/bus.dart';
-import 'package:flutter_firebase_demo/general/back.dart';
 import 'package:flutter_firebase_demo/route/route.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
 import 'package:flutter_firebase_demo/user/signin.dart';
@@ -21,7 +20,7 @@ class NormalMenu extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
-  final appTitle = 'Welcome';
+  String appTitle = 'Welcome';
   final String userType;
   Widget widget;
 
@@ -30,8 +29,10 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (this.userType == UserType.admin) {
+      this.appTitle = "User Information";
       widget = UserInformation();
     } else {
+      this.appTitle = "Pay Fair";
       widget = BookOperation();
     }
 
@@ -40,7 +41,11 @@ class MyHomePage extends StatelessWidget {
         FlatButton(
           child: Text("Log Out"),
           onPressed: () {
-            back(context);
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => SignIn()),
+              (route) => false,
+            );
           },
         ),
       ]),
