@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/back.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
+import 'package:flutter_firebase_demo/user/password-operation.dart';
+import 'package:flutter_firebase_demo/user/password.dart';
 import 'package:flutter_firebase_demo/user/register.dart';
 
 class SignIn extends StatefulWidget {
@@ -48,25 +50,9 @@ class _SignInState extends State<SignIn> {
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getPasswordTextField()),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 10.0, bottom: 10.0, left: 50.0, right: 50.0),
-              child: RaisedButton(
-                child: Text(
-                  "Sign In",
-                  textScaleFactor: 1.5,
-                ),
-                onPressed: () async {
-                  showCircularProgressBar(context);
-                  setState(() async {
-                    if (_formKey.currentState.validate()) {
-                      debugPrint("Sign In Clicked");
-                      await signInUser();
-                    }
-                  });
-                },
-              ),
-            )
+            getSignInButton(),
+            getForgotPasswordButton(),
+            getRegisterButton()
           ],
         ),
       ),
@@ -103,6 +89,7 @@ class _SignInState extends State<SignIn> {
       back(context);
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         debugPrint("Signed In Successfully.");
+        passwordController.text = "";
         return Register(
           userType: users.documents[0].data[UserType.text],
         );
@@ -142,6 +129,60 @@ class _SignInState extends State<SignIn> {
           labelText: "Password",
           hintText: "Please Enter Password",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+    );
+  }
+
+  getSignInButton() {
+    return Padding(
+        padding:
+            EdgeInsets.only(top: 10.0, bottom: 10.0, left: 50.0, right: 50.0),
+        child: RaisedButton(
+          child: Text(
+            "Sign In",
+            textScaleFactor: 1.5,
+          ),
+          onPressed: () async {
+            showCircularProgressBar(context);
+            setState(() async {
+              if (_formKey.currentState.validate()) {
+                debugPrint("Sign In Clicked");
+                await signInUser();
+              }
+            });
+          },
+        ));
+  }
+
+  getForgotPasswordButton() {
+    return Padding(
+        padding: EdgeInsets.only(left: 50.0, right: 50.0),
+        child: FlatButton(
+          child: Text("Forgot Password"),
+          onPressed: () async {
+            debugPrint("Forgot Password Clicked");
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              passwordController.text = "";
+              return Password(PasswordOperation.forgotPassowrd);
+            }));
+          },
+        ));
+  }
+
+  getRegisterButton() {
+    return FlatButton(
+      child: Text(
+        "Do not have account, Please Register",
+        textScaleFactor: 1,
+      ),
+      onPressed: () {
+        debugPrint("Register Clicked from Signin Page");
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          passwordController.text = "";
+          return Register(
+            userType: UserType.user,
+          );
+        }));
+      },
     );
   }
 }

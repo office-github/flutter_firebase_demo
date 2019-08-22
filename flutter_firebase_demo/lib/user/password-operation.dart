@@ -1,0 +1,1 @@
+enum PasswordOperation { changePassword, forgotPassowrd }
