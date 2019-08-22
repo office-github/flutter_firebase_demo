@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_demo/dialog/dialog.dart';
+import 'package:flutter_firebase_demo/general/back.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
 import 'package:flutter_firebase_demo/user/register.dart';
 
@@ -54,11 +56,12 @@ class _SignInState extends State<SignIn> {
                   "Sign In",
                   textScaleFactor: 1.5,
                 ),
-                onPressed: () {
-                  setState(() {
+                onPressed: () async {
+                  showCircularProgressBar(context);
+                  setState(() async {
                     if (_formKey.currentState.validate()) {
                       debugPrint("Sign In Clicked");
-                      signInUser();
+                      await signInUser();
                     }
                   });
                 },
@@ -71,7 +74,7 @@ class _SignInState extends State<SignIn> {
   }
 
 //Add record to the firebase database.
-  void signInUser() async {
+  Future<Null> signInUser() async {
     String userName = userNameController.text.trim();
     String password = passwordController.text.trim();
 
@@ -97,6 +100,7 @@ class _SignInState extends State<SignIn> {
     }
 
     if (users.documents.length > 0) {
+      back(context);
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         debugPrint("Signed In Successfully.");
         return Register(
@@ -106,14 +110,10 @@ class _SignInState extends State<SignIn> {
     }
   }
 
-  void back(BuildContext context) {
-    Navigator.pop(context);
-  }
-
   getUserNameTextField() {
     return TextFormField(
-      keyboardType: TextInputType.emailAddress,
-      style: TextStyle(fontSize: 14.0),
+      keyboardType: TextInputType.text,
+      style: TextStyle(fontSize: 14.0, height: 1.0),
       controller: userNameController,
       validator: (String value) {
         if (value.isEmpty) {

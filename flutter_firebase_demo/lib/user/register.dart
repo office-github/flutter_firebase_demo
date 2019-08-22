@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_demo/dialog/dialog.dart';
+import 'package:flutter_firebase_demo/general/back.dart';
+import 'package:flutter_firebase_demo/general/message-type.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
 
 class Register extends StatefulWidget {
@@ -57,7 +60,7 @@ class _RegisterState extends State<Register> {
   }
 
 //Add record to the firebase database.
-  void register() async {
+  Future<Null> register() async {
     String userType = userTypeController.text == null ||
             userTypeController.text.trim().isEmpty
         ? UserType.user
@@ -69,60 +72,47 @@ class _RegisterState extends State<Register> {
 
     debugPrint("Email: $email, Phone No.: $phoneNo");
 
-    String message = await isUserAlreadyExists(email, phoneNo);
+    String message = await userAlreadyExistsMessage(email, phoneNo);
 
     if (message != null) {
-      showDialog<void>(
-        context: context,
-        barrierDismissible: false, // user must tap button!
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Already Exists'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[Text(message)],
-              ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Ok'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
+      back(context);
+      showMessageDialog(
+          context: context,
+          title: "Warning",
+          message: message,
+          type: MessageType.warning);
+    } else {
+      //Get the firebase database collection refrence of the baby collection.
+      CollectionReference reference = Firestore.instance.collection('User');
+      final userAvailable =
+          await reference.orderBy("id", descending: true).getDocuments();
+      int newId = 1;
+
+      if (userAvailable.documents.length > 0) {
+        final lastUser = userAvailable.documents[0].data;
+        newId = lastUser["id"] + 1;
+      }
+
+      Map<String, dynamic> map = new Map();
+      map.addAll({
+        "id": newId,
+        "userType": userType,
+        "fullName": fullName,
+        "email": email,
+        "phoneNo": phoneNo,
+        "password": password
+      });
+
+      await reference.add(map);
+
+      back(context);
+      showMessageDialog(
+          context: context,
+          title: "Success",
+          message: "Registration Successful",
+          type: MessageType.success);
+      debugPrint("Saved Successfully.");
     }
-//Get the firebase database collection refrence of the baby collection.
-    CollectionReference reference = Firestore.instance.collection('User');
-    final userAvailable =
-        await reference.orderBy("id", descending: true).getDocuments();
-    int newId = 1;
-
-    if (userAvailable.documents.length > 0) {
-      final lastUser = userAvailable.documents[0].data;
-      newId = lastUser["id"] + 1;
-    }
-
-    Map<String, dynamic> map = new Map();
-    map.addAll({
-      "id": newId,
-      "userType": userType,
-      "fullName": fullName,
-      "email": email,
-      "phoneNo": phoneNo,
-      "password": password
-    });
-
-    await reference.add(map);
-    debugPrint("Saved Successfully.");
-  }
-
-  void back(BuildContext context) {
-    Navigator.pop(context);
   }
 
   getUserTypeDropDown() {
@@ -247,11 +237,14 @@ class _RegisterState extends State<Register> {
           "Register",
           textScaleFactor: 1.5,
         ),
-        onPressed: () {
-          setState(() {
+        onPressed: () async {
+          showCircularProgressBar(context);
+          setState(() async {
             if (_formKey.currentState.validate()) {
               debugPrint("Register Clicked");
-              register();
+              await register();
+            } else {
+              back(context);
             }
           });
         },
@@ -304,7 +297,7 @@ class _RegisterState extends State<Register> {
     ];
   }
 
-  Future<String> isUserAlreadyExists(String email, int phoneNo) async {
+  Future<String> userAlreadyExistsMessage(String email, int phoneNo) async {
     bool emailExist = await Firestore.instance
         .collection('User')
         .where("email", isEqualTo: email)
