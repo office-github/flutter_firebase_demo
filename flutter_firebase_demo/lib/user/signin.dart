@@ -83,7 +83,7 @@ class _SignInState extends State<SignIn> {
 //Get the firebase database collection refrence of the baby collection.
     CollectionReference reference = Firestore.instance.collection('User');
     var users = await reference
-        .where("email", isEqualTo: userName)
+        .where("email", isEqualTo: userName.toLowerCase())
         .where("password", isEqualTo: password)
         .getDocuments();
 

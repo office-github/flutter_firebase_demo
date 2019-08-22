@@ -23,6 +23,7 @@ class _RegisterState extends State<Register> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController repassWordController = TextEditingController();
   final String userType;
+  String selectedUserType = UserType.user;
   bool validateForm = true;
 
   _RegisterState(this.userType);
@@ -61,12 +62,9 @@ class _RegisterState extends State<Register> {
 
 //Add record to the firebase database.
   Future<Null> register() async {
-    String userType = userTypeController.text == null ||
-            userTypeController.text.trim().isEmpty
-        ? UserType.user
-        : userTypeController.text;
+    String userType = this.selectedUserType;
     String fullName = fullNameController.text.trim();
-    String email = emailController.text.trim();
+    String email = emailController.text.trim().toLowerCase();
     int phoneNo = int.parse(phoneNoController.text.trim());
     String password = passwordController.text.trim();
 
@@ -116,20 +114,26 @@ class _RegisterState extends State<Register> {
   }
 
   getUserTypeDropDown() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      style: TextStyle(fontSize: 14.0),
-      controller: userTypeController,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return "User Type Required";
-        }
-      },
-      decoration: InputDecoration(
-          labelText: "User Type",
-          hintText: "Please Enter User Type",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-    );
+    final items = [UserType.select, UserType.admin, UserType.user];
+
+    return Container(
+        width: 100.0,
+        child: Center(
+          child: DropdownButton<String>(
+            items: items.map((item) {
+              return DropdownMenuItem(
+                value: item,
+                child: Text(item),
+              );
+            }).toList(),
+            onChanged: (userType) {
+              setState(() {
+                this.selectedUserType = userType;
+              });
+            },
+            value: this.selectedUserType,
+          ),
+        ));
   }
 
   getFulNameTextField() {
@@ -140,6 +144,8 @@ class _RegisterState extends State<Register> {
       validator: (String value) {
         if (value.isEmpty) {
           return "Full Name Required";
+        } else if (this.selectedUserType == UserType.select) {
+          return "Please Select User Type First";
         }
       },
       decoration: InputDecoration(
