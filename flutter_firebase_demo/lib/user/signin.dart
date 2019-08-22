@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/back.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
+import 'package:flutter_firebase_demo/user/gridview-menu.dart';
+import 'package:flutter_firebase_demo/user/normal-menu.dart';
 import 'package:flutter_firebase_demo/user/password-operation.dart';
 import 'package:flutter_firebase_demo/user/password.dart';
 import 'package:flutter_firebase_demo/user/register.dart';
@@ -21,17 +24,11 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () {
-          back(context);
+          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
         },
         child: Scaffold(
             appBar: AppBar(
               title: Text("Sign In"),
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () {
-                  back(context);
-                },
-              ),
             ),
             body: getForm()));
   }
@@ -85,14 +82,17 @@ class _SignInState extends State<SignIn> {
       }
     }
 
+    passwordController.text = "";
+
     if (users.documents.length > 0) {
       back(context);
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         debugPrint("Signed In Successfully.");
-        passwordController.text = "";
-        return Register(
-          userType: users.documents[0].data[UserType.text],
-        );
+        return NormalMenu(userType: users.documents[0].data[UserType.text]);
+        //return GridViewMenu();
+        // return Register(
+        //   userType: users.documents[0].data[UserType.text],
+        // );
       }));
     }
   }
