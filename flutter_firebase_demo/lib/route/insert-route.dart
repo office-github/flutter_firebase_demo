@@ -1,17 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class BusOperation extends StatefulWidget {
+class InsertRoute extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _BusState();
+  State<StatefulWidget> createState() => _RouteState();
 }
 
-class _BusState extends State<BusOperation> {
+class _RouteState extends State<InsertRoute> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController idController = TextEditingController();
-  TextEditingController numberController = TextEditingController();
-  TextEditingController ownerController = TextEditingController();
-  TextEditingController routesController = TextEditingController();
+  TextEditingController routeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +19,7 @@ class _BusState extends State<BusOperation> {
         },
         child: Scaffold(
             appBar: AppBar(
-              title: Text("Add BUs Information"),
+              title: Text("Add Route Information"),
               leading: IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () {
@@ -45,13 +43,7 @@ class _BusState extends State<BusOperation> {
                 child: getIdTextField()),
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getNumberDropDown()),
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getOwnerTextField()),
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getRoutesTextField()),
+                child: getRouteTextField()),
             Padding(
               padding: EdgeInsets.only(
                   top: 10.0, bottom: 10.0, left: 50.0, right: 50.0),
@@ -79,16 +71,17 @@ class _BusState extends State<BusOperation> {
 //Add record to the firebase database.
   void save() {
     int id = int.parse(idController.text);
-    String number = numberController.text;
-    String owner = ownerController.text;
-    String routes = routesController.text;
+    String place = routeController.text;
 
-    debugPrint("Name: $id, Vote: $number");
+    debugPrint("Name: $id, Vote: $place");
 
 //Get the firebase database collection refrence of the baby collection.
-    CollectionReference reference = Firestore.instance.collection('Bus');
+    CollectionReference reference = Firestore.instance.collection('Route');
     Map<String, dynamic> map = new Map();
-    map.addAll({"id": id, "number": number, "owner": owner, "routes": routes});
+    map.addAll({
+      "id": id,
+      "place": place,
+    });
 
     reference.add(map);
     debugPrint("Saved Successfully.");
@@ -122,53 +115,19 @@ class _BusState extends State<BusOperation> {
     );
   }
 
-  getNumberDropDown() {
+  getRouteTextField() {
     return TextFormField(
       keyboardType: TextInputType.number,
       style: TextStyle(fontSize: 14.0),
-      controller: numberController,
+      controller: routeController,
       validator: (String value) {
         if (value.isEmpty) {
-          return "Bus Number Required";
+          return "Place Name Required";
         }
       },
       decoration: InputDecoration(
-          labelText: "Bus Number",
-          hintText: "Please Enter Bus Number",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-    );
-  }
-
-  getOwnerTextField() {
-    return TextFormField(
-      keyboardType: TextInputType.text,
-      style: TextStyle(fontSize: 14.0),
-      controller: ownerController,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return "Owner Name Required";
-        }
-      },
-      decoration: InputDecoration(
-          labelText: "Owner Name",
-          hintText: "Please Enter Owner Name",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-    );
-  }
-
-  getRoutesTextField() {
-    return TextFormField(
-      keyboardType: TextInputType.emailAddress,
-      style: TextStyle(fontSize: 14.0),
-      controller: routesController,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return "Routes Required";
-        }
-      },
-      decoration: InputDecoration(
-          labelText: "Routes",
-          hintText: "Please Enter Routes e.g. Balkhu, Kalanki",
+          labelText: "Place Name",
+          hintText: "Please Enter Place Name",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
     );
   }

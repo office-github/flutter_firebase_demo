@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class BookOperation extends StatefulWidget {
+class BookTicket extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _BookState();
 }
 
-class _BookState extends State<BookOperation> {
+class _BookState extends State<BookTicket> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController idController = TextEditingController();
   TextEditingController userIdController = TextEditingController();

@@ -1,11 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_firebase_demo/baby/add_baby.dart';
-import 'package:flutter_firebase_demo/book/book.dart';
-import 'package:flutter_firebase_demo/bus/bus.dart';
-import 'package:flutter_firebase_demo/route/route.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
-import 'package:flutter_firebase_demo/user/signin.dart';
 import 'package:flutter_firebase_demo/user/register.dart';
 
 class UserInformation extends StatelessWidget {
@@ -26,7 +21,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildBody(context),
+      //body: _buildBody(context),
+      body: Text("User Information"),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint("Add button clicked!");

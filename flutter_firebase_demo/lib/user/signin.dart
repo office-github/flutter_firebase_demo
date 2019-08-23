@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/back.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
-import 'package:flutter_firebase_demo/user/gridview-menu.dart';
 import 'package:flutter_firebase_demo/user/normal-menu.dart';
 import 'package:flutter_firebase_demo/user/password-operation.dart';
 import 'package:flutter_firebase_demo/user/password.dart';
@@ -64,7 +63,7 @@ class _SignInState extends State<SignIn> {
     debugPrint("Name: $userName, Password: $password");
 
 //Get the firebase database collection refrence of the baby collection.
-    CollectionReference reference = Firestore.instance.collection('User');
+    /*CollectionReference reference = Firestore.instance.collection('User');
     var users = await reference
         .where("email", isEqualTo: userName.toLowerCase())
         .where("password", isEqualTo: password)
@@ -80,21 +79,19 @@ class _SignInState extends State<SignIn> {
         print(e);
         print(s);
       }
-    }
+    }*/
 
     passwordController.text = "";
-
-    if (users.documents.length > 0) {
-      back(context);
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        debugPrint("Signed In Successfully.");
-        return NormalMenu(userType: users.documents[0].data[UserType.text]);
-        //return GridViewMenu();
-        // return Register(
-        //   userType: users.documents[0].data[UserType.text],
-        // );
-      }));
-    }
+    Future.delayed(Duration(milliseconds: 2000), () => {});
+    //if (users.documents.length > 0) {
+    back(context);
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      debugPrint("Signed In Successfully.");
+      return NormalMenu(userType: UserType.admin);
+      //return NormalMenu(userType: users.documents[0].data[UserType.text]);
+      //return GridViewMenu();
+    }));
+    //}
   }
 
   getUserNameTextField() {
