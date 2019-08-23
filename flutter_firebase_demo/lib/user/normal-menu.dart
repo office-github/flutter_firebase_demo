@@ -1,100 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/book/book-ticket.dart';
 import 'package:flutter_firebase_demo/bus/insert-bus.dart';
-import 'package:flutter_firebase_demo/general/back.dart';
 import 'package:flutter_firebase_demo/route/insert-route.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
-import 'package:flutter_firebase_demo/user/signin.dart';
 import 'package:flutter_firebase_demo/user/user-information.dart';
 
-class NormalMenu extends StatelessWidget {
+class NormalMenu extends StatefulWidget {
   final String userType;
 
   NormalMenu({this.userType});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: MyHomePage(userType: this.userType),
-    );
-  }
+  State<StatefulWidget> createState() =>
+      _NormalMenuState(userType: this.userType);
 }
 
-class MyHomePage extends StatelessWidget {
+class _NormalMenuState extends State<NormalMenu> {
   String appTitle = 'Welcome';
   final String userType;
-  Widget widget;
+  Widget viewBasedOnUser;
 
-  MyHomePage({Key key, this.userType}) : super(key: key);
+  _NormalMenuState({this.userType});
+
+  @override
+  void initState() {
+    if (this.userType == UserType.admin) {
+      this.appTitle = "User Information";
+      viewBasedOnUser = UserInformation();
+    } else {
+      this.appTitle = "Pay Fair";
+      viewBasedOnUser = BookTicket();
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (this.userType == UserType.admin) {
-      this.appTitle = "User Information";
-      widget = UserInformation();
-    } else {
-      this.appTitle = "Pay Fair";
-      widget = BookTicket();
-    }
-
-    return WillPopScope(
-        onWillPop: () {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => SignIn()),
-            (route) => false,
-          );
-        },
-        child: Scaffold(
-          appBar: AppBar(title: Text(appTitle), actions: [
-            FlatButton(
-              child: Text("Log Out"),
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => SignIn()),
-                  (route) => false,
-                );
+    return Scaffold(
+      appBar: AppBar(title: Text(appTitle), actions: [
+        FlatButton(
+          child: Text("Log Out"),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ]),
+      body: Center(child: viewBasedOnUser),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('Profile Picture'),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              title: Text('Add Bus'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  debugPrint("Insert Bus Navigation.");
+                  return InsertBus();
+                }));
               },
             ),
-          ]),
-          body: Center(child: widget),
-          drawer: Drawer(
-            child: ListView(
-              // Important: Remove any padding from the ListView.
-              padding: EdgeInsets.zero,
-              children: <Widget>[
-                DrawerHeader(
-                  child: Text('Profile Picture'),
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                  ),
-                ),
-                ListTile(
-                  title: Text('Add Bus'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      debugPrint("Bus Operation Navigation.");
-                      return InsertBus();
-                    }));
-                  },
-                ),
-                ListTile(
-                  title: Text('Add Route'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      debugPrint("Route Operation Navigation.");
-                      return InsertRoute();
-                    }));
-                  },
-                ),
-              ],
+            ListTile(
+              title: Text('Add Route'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  debugPrint("Insert Route Navigation.");
+                  return InsertRoute();
+                }));
+              },
             ),
-          ),
-        ));
+          ],
+        ),
+      ),
+    );
   }
 }

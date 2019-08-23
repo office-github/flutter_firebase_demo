@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/back.dart';
+import 'package:flutter_firebase_demo/general/message-type.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
 import 'package:flutter_firebase_demo/user/normal-menu.dart';
 import 'package:flutter_firebase_demo/user/password-operation.dart';
@@ -56,34 +57,54 @@ class _SignInState extends State<SignIn> {
   }
 
 //Add record to the firebase database.
-  Future<Null> signInUser() async {
+  void signInUser() {
     String userName = userNameController.text.trim();
     String password = passwordController.text.trim();
 
     debugPrint("Name: $userName, Password: $password");
 
 //Get the firebase database collection refrence of the baby collection.
-    /*CollectionReference reference = Firestore.instance.collection('User');
-    var users = await reference
+    CollectionReference reference = Firestore.instance.collection('User');
+    reference
         .where("email", isEqualTo: userName.toLowerCase())
         .where("password", isEqualTo: password)
-        .getDocuments();
-
-    if (users.documents.length == 0) {
-      try {
-        users = await reference
+        .getDocuments()
+        .then((snapshot) {
+      if (snapshot.documents.length > 0) {
+        redirectToPage();
+      } else {
+        reference
             .where("phoneNo", isEqualTo: int.parse(userName))
             .where("password", isEqualTo: password)
-            .getDocuments();
-      } catch (e, s) {
-        print(e);
-        print(s);
+            .getDocuments()
+            .then((snapshot) {
+          if (snapshot.documents.length > 0) {
+            redirectToPage();
+          } else {
+            back(context);
+            showMessageDialog(
+                context: context,
+                title: "Sign In Error",
+                message: "Invalid User Name or Password",
+                type: MessageType.error);
+          }
+        });
       }
-    }*/
+    }).catchError((e, s) {
+      print(e + s);
+      back(context);
+      showMessageDialog(
+          context: context,
+          title: "Sign In Error",
+          message: "Error occured. Please try again later.",
+          type: MessageType.error);
+    });
 
+    //redirectToPage();
+  }
+
+  redirectToPage() {
     passwordController.text = "";
-    Future.delayed(Duration(milliseconds: 2000), () => {});
-    //if (users.documents.length > 0) {
     back(context);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       debugPrint("Signed In Successfully.");
@@ -91,7 +112,6 @@ class _SignInState extends State<SignIn> {
       //return NormalMenu(userType: users.documents[0].data[UserType.text]);
       //return GridViewMenu();
     }));
-    //}
   }
 
   getUserNameTextField() {
@@ -140,10 +160,10 @@ class _SignInState extends State<SignIn> {
           ),
           onPressed: () async {
             showCircularProgressBar(context);
-            setState(() async {
+            setState(() {
               if (_formKey.currentState.validate()) {
                 debugPrint("Sign In Clicked");
-                await signInUser();
+                signInUser();
               }
             });
           },
