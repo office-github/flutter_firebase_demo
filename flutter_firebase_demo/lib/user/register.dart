@@ -6,7 +6,7 @@ import 'package:flutter_firebase_demo/general/message-type.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
 
 class Register extends StatefulWidget {
-  String userType = UserType.user;
+  final String userType;
 
   Register({this.userType});
 
