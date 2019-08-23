@@ -27,8 +27,8 @@ class _MyHomePageState extends State<BusInformation> {
               },
             ),
           ),
-          //body: _buildBody(context),
-          body: Text("Bus Information"),
+          body: _buildBody(context),
+          //body: Text("Bus Information"),
         ));
   }
 
@@ -56,7 +56,7 @@ class _MyHomePageState extends State<BusInformation> {
       final record = Bus.fromSnapshot(data);
 
       return Padding(
-        key: ValueKey(record.id),
+        key: ValueKey(record.number),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Container(
           decoration: BoxDecoration(
@@ -66,7 +66,8 @@ class _MyHomePageState extends State<BusInformation> {
           child: ListTile(
             title: Text(record.number),
             trailing: Text(record.owner),
-            subtitle: Text("Routes: ${record.routes}"),
+            subtitle: Text(
+                "Routes: ${record.routes}\nTotal Fair: ${record.totalFair}\nDiscount: ${record.discount} %\n Bonus: ${record.bonus}"),
             // onTap: () => Firestore.instance.runTransaction((transaction) async {
             //       final freshSnapshot = await transaction.get(record.reference);
             //       final fresh = Record.fromSnapshot(freshSnapshot);
@@ -77,8 +78,9 @@ class _MyHomePageState extends State<BusInformation> {
           ),
         ),
       );
-    } catch (e) {
-      debugPrint(e);
+    } catch (e, s) {
+      print(e);
+      print(s);
     }
   }
 }

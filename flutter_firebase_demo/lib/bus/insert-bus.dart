@@ -8,9 +8,11 @@ class InsertBus extends StatefulWidget {
 
 class _BusState extends State<InsertBus> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController idController = TextEditingController();
   TextEditingController numberController = TextEditingController();
   TextEditingController ownerController = TextEditingController();
+  TextEditingController discountController = TextEditingController();
+  TextEditingController bonusController = TextEditingController();
+  TextEditingController totalFairController = TextEditingController();
   TextEditingController routesController = TextEditingController();
 
   @override
@@ -42,13 +44,13 @@ class _BusState extends State<InsertBus> {
           children: <Widget>[
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getIdTextField()),
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getNumberDropDown()),
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getOwnerTextField()),
+            Padding(
+                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                child: getDiscountTextField()),
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getRoutesTextField()),
@@ -78,17 +80,26 @@ class _BusState extends State<InsertBus> {
 
 //Add record to the firebase database.
   void save() {
-    int id = int.parse(idController.text);
     String number = numberController.text;
     String owner = ownerController.text;
+    double discount = double.parse(discountController.text);
+    double bonus = double.parse(bonusController.text);
+    double totalFair = double.parse(totalFairController.text);
     String routes = routesController.text;
 
-    debugPrint("Name: $id, Vote: $number");
+    debugPrint("Bus Number: $number, Bus Routes: $routes");
 
 //Get the firebase database collection refrence of the baby collection.
     CollectionReference reference = Firestore.instance.collection('Bus');
     Map<String, dynamic> map = new Map();
-    map.addAll({"id": id, "number": number, "owner": owner, "routes": routes});
+    map.addAll({
+      "number": number,
+      "owner": owner,
+      "discount": discount,
+      "bonus": bonus,
+      "totalFair": totalFair,
+      "routes": routes
+    });
 
     reference.add(map);
     debugPrint("Saved Successfully.");
@@ -98,19 +109,67 @@ class _BusState extends State<InsertBus> {
     Navigator.pop(context);
   }
 
-  getIdTextField() {
+  getDiscountTextField() {
     return TextFormField(
       keyboardType: TextInputType.number,
       style: TextStyle(fontStyle: FontStyle.normal, fontSize: 14.0),
-      controller: idController,
+      controller: discountController,
       validator: (String value) {
         if (value.isEmpty) {
-          return "Id Required";
+          return "Discount Required";
         }
       },
       decoration: InputDecoration(
-          labelText: "Id",
-          hintText: "Please Enter Id",
+          labelText: "Discount(%)",
+          hintText: "Please Enter Discount",
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+      onEditingComplete: () {
+        setState(() {
+          if (_formKey.currentState.validate()) {
+            print("Valid");
+          }
+        });
+      },
+    );
+  }
+
+  getBonusTextField() {
+    return TextFormField(
+      keyboardType: TextInputType.number,
+      style: TextStyle(fontStyle: FontStyle.normal, fontSize: 14.0),
+      controller: discountController,
+      validator: (String value) {
+        if (value.isEmpty) {
+          return "Bonus Required";
+        }
+      },
+      decoration: InputDecoration(
+          labelText: "Bonus(%)",
+          hintText: "Please Enter Bonus",
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+      onEditingComplete: () {
+        setState(() {
+          if (_formKey.currentState.validate()) {
+            print("Valid");
+          }
+        });
+      },
+    );
+  }
+
+  getTotalFairTextField() {
+    return TextFormField(
+      keyboardType: TextInputType.number,
+      style: TextStyle(fontStyle: FontStyle.normal, fontSize: 14.0),
+      controller: totalFairController,
+      validator: (String value) {
+        if (value.isEmpty) {
+          return "Total Fair Required";
+        }
+      },
+      decoration: InputDecoration(
+          labelText: "Total Fair",
+          hintText: "Please Enter Total Fair",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
       onEditingComplete: () {
         setState(() {
