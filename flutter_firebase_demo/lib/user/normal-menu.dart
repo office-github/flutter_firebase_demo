@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/book/book-ticket.dart';
+import 'package:flutter_firebase_demo/book/ticket-information.dart';
+import 'package:flutter_firebase_demo/bus/bus-information.dart';
 import 'package:flutter_firebase_demo/bus/insert-bus.dart';
 import 'package:flutter_firebase_demo/route/insert-route.dart';
+import 'package:flutter_firebase_demo/route/route-information.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
 import 'package:flutter_firebase_demo/user/register.dart';
 import 'package:flutter_firebase_demo/user/user-information.dart';
@@ -67,6 +70,9 @@ class _NormalMenuState extends State<NormalMenu> {
                 }));
               },
             ),
+            Divider(
+              color: Theme.of(context).primaryColor,
+            ),
             ListTile(
               title: Text('Add Route'),
               onTap: () {
@@ -76,6 +82,48 @@ class _NormalMenuState extends State<NormalMenu> {
                   return InsertRoute();
                 }));
               },
+            ),
+            Divider(
+              color: Theme.of(context).primaryColor,
+            ),
+            ListTile(
+              title: Text('Show Bus Infomation'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  debugPrint("Show Bus Information Navigation.");
+                  return BusInformation();
+                }));
+              },
+            ),
+            Divider(
+              color: Theme.of(context).primaryColor,
+            ),
+            ListTile(
+              title: Text('Show Route Information'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  debugPrint("Show Route Information Navigation.");
+                  return RouteInformation();
+                }));
+              },
+            ),
+            Divider(
+              color: Theme.of(context).primaryColor,
+            ),
+            ListTile(
+              title: Text('Show Ticket Information'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  debugPrint("Show Ticekt Information Navigation.");
+                  return TicketInformation();
+                }));
+              },
+            ),
+            Divider(
+              color: Theme.of(context).primaryColor,
             ),
           ],
         ),

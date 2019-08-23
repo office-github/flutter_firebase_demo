@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/back.dart';
-import 'package:flutter_firebase_demo/general/message-type.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
 import 'package:flutter_firebase_demo/user/normal-menu.dart';
 import 'package:flutter_firebase_demo/user/password-operation.dart';
@@ -65,7 +64,7 @@ class _SignInState extends State<SignIn> {
 
 //Get the firebase database collection refrence of the baby collection.
     CollectionReference reference = Firestore.instance.collection('User');
-    reference
+    /*reference
         .where("email", isEqualTo: userName.toLowerCase())
         .where("password", isEqualTo: password)
         .getDocuments()
@@ -98,9 +97,9 @@ class _SignInState extends State<SignIn> {
           title: "Sign In Error",
           message: "Error occured. Please try again later.",
           type: MessageType.error);
-    });
+    });*/
 
-    //redirectToPage();
+    redirectToPage();
   }
 
   redirectToPage() {
@@ -159,9 +158,9 @@ class _SignInState extends State<SignIn> {
             textScaleFactor: 1.5,
           ),
           onPressed: () async {
-            showCircularProgressBar(context);
             setState(() {
               if (_formKey.currentState.validate()) {
+                showCircularProgressBar(context);
                 debugPrint("Sign In Clicked");
                 signInUser();
               }

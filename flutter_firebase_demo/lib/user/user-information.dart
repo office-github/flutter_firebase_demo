@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_firebase_demo/user/UserType.dart';
-import 'package:flutter_firebase_demo/user/register.dart';
 
 class UserInformation extends StatelessWidget {
   @override
