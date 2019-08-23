@@ -3,6 +3,7 @@ import 'package:flutter_firebase_demo/book/book-ticket.dart';
 import 'package:flutter_firebase_demo/bus/insert-bus.dart';
 import 'package:flutter_firebase_demo/route/insert-route.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
+import 'package:flutter_firebase_demo/user/register.dart';
 import 'package:flutter_firebase_demo/user/user-information.dart';
 
 class NormalMenu extends StatefulWidget {
@@ -78,6 +79,18 @@ class _NormalMenuState extends State<NormalMenu> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          debugPrint("floating button clicked!");
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return Register(
+              userType: UserType.admin,
+            );
+          }));
+        },
+        child: Icon(Icons.add),
+        tooltip: "User Registration",
       ),
     );
   }

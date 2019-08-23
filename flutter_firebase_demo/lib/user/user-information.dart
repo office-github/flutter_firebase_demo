@@ -23,18 +23,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       //body: _buildBody(context),
       body: Text("User Information"),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          debugPrint("Add button clicked!");
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return Register(
-              userType: UserType.admin,
-            );
-          }));
-        },
-        child: Icon(Icons.add),
-        tooltip: "Add More Item",
-      ),
     );
   }
 
@@ -70,8 +58,10 @@ class _MyHomePageState extends State<MyHomePage> {
             borderRadius: BorderRadius.circular(5.0),
           ),
           child: ListTile(
-            title: Text(record.email),
-            trailing: Text(record.password),
+            title: Text(record.fullName),
+            trailing: Text(record.userType),
+            subtitle:
+                Text("Email: ${record.email}\nPhone No.: ${record.phoneNo}"),
             // onTap: () => Firestore.instance.runTransaction((transaction) async {
             //       final freshSnapshot = await transaction.get(record.reference);
             //       final fresh = Record.fromSnapshot(freshSnapshot);
