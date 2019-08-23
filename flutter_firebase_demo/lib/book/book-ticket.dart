@@ -1,5 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_demo/dialog/dialog.dart';
+import 'package:flutter_firebase_demo/general/message-type.dart';
+import 'package:flutter_firebase_demo/user/current-user.dart';
+import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 
 class BookTicket extends StatefulWidget {
   @override
@@ -8,14 +12,29 @@ class BookTicket extends StatefulWidget {
 
 class _BookState extends State<BookTicket> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController idController = TextEditingController();
-  TextEditingController userIdController = TextEditingController();
-  TextEditingController busIdController = TextEditingController();
+  GlobalKey<AutoCompleteTextFieldState<String>> busNumberTextFieldKey =
+      GlobalKey();
   TextEditingController sourceController = TextEditingController();
   TextEditingController destinationController = TextEditingController();
   TextEditingController fairController = TextEditingController();
   TextEditingController discountController = TextEditingController();
   TextEditingController totalController = TextEditingController();
+  TextEditingController busNumberController = TextEditingController();
+  AutoCompleteTextField<String> busNumberFilerField;
+  List<String> busNumbers = List<String>();
+
+  @override
+  void initState() {
+    CollectionReference reference = Firestore.instance.collection('Bus');
+    reference.getDocuments().then((snapshot) {
+      snapshot.documents.forEach((document) {
+        busNumbers.add(document["number"]);
+      });
+    }).catchError((e, s) {
+      print(e + s);
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +55,7 @@ class _BookState extends State<BookTicket> {
           children: <Widget>[
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getIdTextField()),
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getUserIdTextField()),
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getBusIdTextField()),
+                child: getBusNumberAutoCompleteTextField()),
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getSourceTextField()),
@@ -84,24 +97,24 @@ class _BookState extends State<BookTicket> {
 
 //Add record to the firebase database.
   void payFair() {
-    int id = int.parse(idController.text);
-    int userId = int.parse(userIdController.text);
-    int busId = int.parse(busIdController.text);
+    int id = 0;
+    int userId = CurrentUser.id;
+    String busNumber = busNumberController.text;
     String source = sourceController.text;
     String destination = destinationController.text;
     double fair = double.parse(fairController.text);
     double discount = double.parse(discountController.text);
     double totalFair = double.parse(totalController.text);
 
-    debugPrint("Name: $id, Vote: $totalFair");
+    debugPrint("userId: $userId, Bus Number: $busNumber");
 
 //Get the firebase database collection refrence of the baby collection.
-    CollectionReference reference = Firestore.instance.collection('Book');
+    /*CollectionReference reference = Firestore.instance.collection('Book');
     Map<String, dynamic> map = new Map();
     map.addAll({
       "id": id,
       "userId": userId,
-      "busId": busId,
+      "busNumber": busNumber,
       "source": source,
       "destination": destination,
       "fair": fair,
@@ -111,70 +124,55 @@ class _BookState extends State<BookTicket> {
 
     reference.add(map);
     debugPrint("Saved Successfully.");
+    back(context);
+    showMessageDialog(
+        context: context,
+        title: "Success",
+        message: "Registration Successful",
+        type: MessageType.success);*/
   }
 
   void back(BuildContext context) {
     Navigator.pop(context);
   }
 
-  getIdTextField() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      style: TextStyle(fontStyle: FontStyle.normal, fontSize: 14.0),
-      textInputAction: TextInputAction.next,
-      controller: idController,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return "Id Required";
-        }
-      },
+  getBusNumberAutoCompleteTextField() {
+    return busNumberFilerField = AutoCompleteTextField<String>(
+      key: busNumberTextFieldKey,
+      clearOnSubmit: false,
+      suggestions: busNumbers,
+      style: TextStyle(color: Colors.black, fontSize: 14),
       decoration: InputDecoration(
-          labelText: "Id",
-          hintText: "Please Enter Id",
+          labelText: "Bus Number",
+          hintText: "Please Enter Bus Number",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-      onEditingComplete: () {
+      controller: busNumberController,
+      itemFilter: (item, query) {
+        return item.toLowerCase().contains(query.toLowerCase());
+      },
+      itemSorter: (a, b) {
+        return a.toLowerCase().compareTo(b.toLowerCase());
+      },
+      itemSubmitted: (item) {
         setState(() {
-          if (_formKey.currentState.validate()) {
-            print("Valid");
-          }
+          busNumberController.text = item;
         });
       },
+      itemBuilder: (context, item) {
+        return row(item);
+      },
     );
   }
 
-  getUserIdTextField() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      style: TextStyle(fontSize: 14.0),
-      textInputAction: TextInputAction.next,
-      controller: userIdController,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return "User Id Required";
-        }
-      },
-      decoration: InputDecoration(
-          labelText: "User Id",
-          hintText: "Please Enter User Id",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-    );
-  }
-
-  getBusIdTextField() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      style: TextStyle(fontSize: 14.0),
-      textInputAction: TextInputAction.next,
-      controller: busIdController,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return "Bud Id Required";
-        }
-      },
-      decoration: InputDecoration(
-          labelText: "Bus Id",
-          hintText: "Please Enter Bus Id",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+  Widget row(String busNumber) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Text(
+          busNumber,
+          style: TextStyle(fontSize: 14),
+        )
+      ],
     );
   }
 

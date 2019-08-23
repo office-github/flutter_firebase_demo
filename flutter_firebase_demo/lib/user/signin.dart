@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/back.dart';
+import 'package:flutter_firebase_demo/general/message-type.dart';
+import 'package:flutter_firebase_demo/menu/gridview-menu.dart';
+import 'package:flutter_firebase_demo/menu/normal-menu.dart';
 import 'package:flutter_firebase_demo/user/UserType.dart';
-import 'package:flutter_firebase_demo/user/normal-menu.dart';
+import 'package:flutter_firebase_demo/user/current-user.dart';
 import 'package:flutter_firebase_demo/user/password-operation.dart';
 import 'package:flutter_firebase_demo/user/password.dart';
 import 'package:flutter_firebase_demo/user/register.dart';
@@ -63,13 +66,16 @@ class _SignInState extends State<SignIn> {
     debugPrint("Name: $userName, Password: $password");
 
 //Get the firebase database collection refrence of the baby collection.
-    CollectionReference reference = Firestore.instance.collection('User');
-    /*reference
+    /*CollectionReference reference = Firestore.instance.collection('User');
+    reference
         .where("email", isEqualTo: userName.toLowerCase())
         .where("password", isEqualTo: password)
         .getDocuments()
         .then((snapshot) {
       if (snapshot.documents.length > 0) {
+        CurrentUser.id = snapshot.documents[0].data["id"];
+        CurrentUser.userType = snapshot.documents[0].data[UserType.text];
+        CurrentUser.userName = snapshot.documents[0].data["userName"];
         redirectToPage();
       } else {
         reference
@@ -78,6 +84,9 @@ class _SignInState extends State<SignIn> {
             .getDocuments()
             .then((snapshot) {
           if (snapshot.documents.length > 0) {
+            CurrentUser.id = snapshot.documents[0].data["id"];
+            CurrentUser.userType = snapshot.documents[0].data[UserType.text];
+            CurrentUser.userName = snapshot.documents[0].data["userName"];
             redirectToPage();
           } else {
             back(context);
@@ -97,8 +106,11 @@ class _SignInState extends State<SignIn> {
           title: "Sign In Error",
           message: "Error occured. Please try again later.",
           type: MessageType.error);
-    });*/
-
+    });
+*/
+    CurrentUser.id = 1;
+    CurrentUser.userName = "a@a.com";
+    CurrentUser.userType = UserType.user;
     redirectToPage();
   }
 
@@ -107,7 +119,7 @@ class _SignInState extends State<SignIn> {
     back(context);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       debugPrint("Signed In Successfully.");
-      return NormalMenu(userType: UserType.admin);
+      return NormalMenu(userType: UserType.user);
       //return NormalMenu(userType: users.documents[0].data[UserType.text]);
       //return GridViewMenu();
     }));
