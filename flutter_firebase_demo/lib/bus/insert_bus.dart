@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_demo/dialog/dialog.dart';
+import 'package:flutter_firebase_demo/general/message_type.dart';
 
 class InsertBus extends StatefulWidget {
   @override
@@ -54,7 +56,13 @@ class _BusState extends State<InsertBus> {
                 child: getOwnerTextField()),
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                child: getTotalFairTextField()),
+            Padding(
+                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getDiscountTextField()),
+            Padding(
+                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                child: getBonusTextField()),
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getRoutesTextField()),
@@ -69,6 +77,7 @@ class _BusState extends State<InsertBus> {
                 onPressed: () {
                   setState(() {
                     if (_formKey.currentState.validate()) {
+                      showCircularProgressBar(context);
                       debugPrint("Add Clicked");
                       save();
                     }
@@ -84,7 +93,7 @@ class _BusState extends State<InsertBus> {
 
 //Add record to the firebase database.
   void save() {
-    String number = numberController.text;
+    String number = numberController.text.toUpperCase();
     String owner = ownerController.text;
     String name = nameController.text;
     double discount = double.parse(discountController.text);
@@ -95,20 +104,54 @@ class _BusState extends State<InsertBus> {
     debugPrint("Bus Number: $number, Bus Routes: $routes");
 
 //Get the firebase database collection refrence of the baby collection.
-    CollectionReference reference = Firestore.instance.collection('Bus');
-    Map<String, dynamic> map = new Map();
-    map.addAll({
-      "number": number,
-      "owner": owner,
-      "name": name,
-      "discount": discount,
-      "bonus": bonus,
-      "totalFair": totalFair,
-      "routes": routes
-    });
+    try {
+      Firestore.instance
+          .collection('Bus')
+          .where("number", isEqualTo: number.toUpperCase())
+          .getDocuments()
+          .then((snapshot) {
+                back(context);
+        if (snapshot.documents.length > 0) {
+          showMessageDialog(
+              context: context,
+              title: "Bus Information",
+              message: "Bus Information Already Added.",
+              type: MessageType.warning);
+        } else {
+          CollectionReference reference = Firestore.instance.collection('Bus');
+          Map<String, dynamic> map = new Map();
+          map.addAll({
+            "number": number,
+            "owner": owner,
+            "name": name,
+            "discount": discount,
+            "bonus": bonus,
+            "totalFair": totalFair,
+            "routes": routes
+          });
 
-    reference.add(map);
-    debugPrint("Saved Successfully.");
+          reference.add(map);
+              back(context);
+          showMessageDialog(
+                  context: context,
+                  title: "Bus Information",
+                  message: "Bus Information Added Successfylly",
+                  type: MessageType.success)
+              .then((s) {
+            back(context);
+          });
+          debugPrint("Saved Successfully.");
+        }
+      });
+    } catch (e, s) {
+      print(e);
+      print(s);
+      showMessageDialog(
+          context: context,
+          title: "Bus Information",
+          message: "Failed To Add Bus Information, Please try again.",
+          type: MessageType.error);
+    }
   }
 
   void back(BuildContext context) {
@@ -143,7 +186,7 @@ class _BusState extends State<InsertBus> {
     return TextFormField(
       keyboardType: TextInputType.number,
       style: TextStyle(fontStyle: FontStyle.normal, fontSize: 14.0),
-      controller: discountController,
+      controller: bonusController,
       validator: (String value) {
         if (value.isEmpty) {
           return "Bonus Required";
@@ -187,26 +230,26 @@ class _BusState extends State<InsertBus> {
     );
   }
 
-getNameTextField() {
-  return TextFormField(
-    keyboardType: TextInputType.number,
-    style: TextStyle(fontSize: 14.0),
-    controller: nameController,
-    validator: (String value) {
-      if (value.isEmpty) {
-        return "Bus Name Required";
-      }
-    },
-    decoration: InputDecoration(
-        labelText: "Bus Name",
-        hintText: "Please Enter Bus Name",
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-  );
-}
+  getNameTextField() {
+    return TextFormField(
+      keyboardType: TextInputType.text,
+      style: TextStyle(fontSize: 14.0),
+      controller: nameController,
+      validator: (String value) {
+        if (value.isEmpty) {
+          return "Bus Name Required";
+        }
+      },
+      decoration: InputDecoration(
+          labelText: "Bus Name",
+          hintText: "Please Enter Bus Name",
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+    );
+  }
 
   getNumberTextField() {
     return TextFormField(
-      keyboardType: TextInputType.number,
+      keyboardType: TextInputType.text,
       style: TextStyle(fontSize: 14.0),
       controller: numberController,
       validator: (String value) {

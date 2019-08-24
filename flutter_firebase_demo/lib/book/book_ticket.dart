@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/message_type.dart';
+import 'package:flutter_firebase_demo/menu/normal_menu.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:flutter_firebase_demo/user/current_user.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
@@ -52,9 +53,25 @@ class _BookState extends State<BookTicket> {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () {
-          back(context);
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            debugPrint("Book Ticket Navigation.");
+            return NormalMenu(userType: CurrentUser.userType);
+          }));
         },
-        child: Scaffold(body: getForm()));
+        child: Scaffold(
+            appBar: AppBar(
+              title: Text("Pay Amount"),
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    debugPrint("Book Ticket Navigation.");
+                    return NormalMenu(userType: CurrentUser.userType);
+                  }));
+                },
+              ),
+            ),
+            body: getForm()));
   }
 
   Widget getForm() {

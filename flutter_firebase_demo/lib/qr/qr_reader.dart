@@ -63,9 +63,6 @@ class _MyAppState extends State<QRReader> with SingleTickerProviderStateMixin {
     return new MaterialApp(
       home: new Scaffold(
         key: _scaffoldKey,
-        appBar: new AppBar(
-          title: const Text('Scan Bus'),
-        ),
         floatingActionButton: FloatingActionButton(
           child: new Icon(Icons.check),
           onPressed: () {
@@ -134,11 +131,11 @@ class _MyAppState extends State<QRReader> with SingleTickerProviderStateMixin {
     //showInSnackBar(value.toString());
     // ... do something
     // wait 5 seconds then start scanning again.
-    //Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  debugPrint("Book Ticket Navigation.");
-                  return BookTicket(value.toString());
-                }));
+    Navigator.pop(context);
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      debugPrint("Book Ticket Navigation.");
+      return BookTicket(value.toString());
+    }));
     new Future.delayed(const Duration(seconds: 5), controller.startScanning);
   }
 

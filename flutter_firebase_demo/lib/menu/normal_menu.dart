@@ -6,6 +6,8 @@ import 'package:flutter_firebase_demo/bus/insert_bus.dart';
 import 'package:flutter_firebase_demo/qr/qr_reader.dart';
 import 'package:flutter_firebase_demo/route/insert_route.dart';
 import 'package:flutter_firebase_demo/route/route_information.dart';
+import 'package:flutter_firebase_demo/user/current_user.dart';
+import 'package:flutter_firebase_demo/user/signin.dart';
 import 'package:flutter_firebase_demo/user/user_type.dart';
 import 'package:flutter_firebase_demo/user/register.dart';
 import 'package:flutter_firebase_demo/user/user_information.dart';
@@ -46,7 +48,15 @@ class _NormalMenuState extends State<NormalMenu> {
         FlatButton(
           child: Text("Log Out"),
           onPressed: () {
-            Navigator.pop(context);
+            if (CurrentUser.userType == UserType.admin) {
+              Navigator.pop(context);
+            } else {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                debugPrint("Sign In Navigation.");
+                return SignIn();
+              }));
+            }
           },
         ),
       ]),
