@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:fast_qr_reader_view/fast_qr_reader_view.dart';
+import 'package:flutter_firebase_demo/book/book_ticket.dart';
+import 'package:flutter_firebase_demo/dialog/dialog.dart';
+import 'package:flutter_firebase_demo/general/message_type.dart';
 
 List<CameraDescription> cameras;
 
@@ -20,35 +23,37 @@ class _MyAppState extends State<QRReader> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    try {
-      availableCameras().then((cameraList) {
-        cameras = cameraList;
-        
-        animationController = new AnimationController(
-          vsync: this,
-          duration: new Duration(seconds: 3),
-        );
+    availableCameras().then((cameraList) {
+      cameras = cameraList;
+      animationController = new AnimationController(
+        vsync: this,
+        duration: new Duration(seconds: 3),
+      );
 
-        animationController.addListener(() {
-          this.setState(() {});
-        });
-        animationController.forward();
-        verticalPosition = Tween<double>(begin: 0.0, end: 300.0).animate(
-            CurvedAnimation(parent: animationController, curve: Curves.linear))
-          ..addStatusListener((state) {
-            if (state == AnimationStatus.completed) {
-              animationController.reverse();
-            } else if (state == AnimationStatus.dismissed) {
-              animationController.forward();
-            }
-          });
-
-        // pick the first available camera
-        onNewCameraSelected(cameras[0]);
+      animationController.addListener(() {
+        this.setState(() {});
       });
-    } on QRReaderException catch (e) {
+      animationController.forward();
+      verticalPosition = Tween<double>(begin: 0.0, end: 300.0).animate(
+          CurvedAnimation(parent: animationController, curve: Curves.linear))
+        ..addStatusListener((state) {
+          if (state == AnimationStatus.completed) {
+            animationController.reverse();
+          } else if (state == AnimationStatus.dismissed) {
+            animationController.forward();
+          }
+        });
+
+      // pick the first available camera
+      onNewCameraSelected(cameras[0]);
+    }).catchError((e, s) {
       logError(e.code, e.description);
-    }
+      showMessageDialog(
+          context: context,
+          title: "Error",
+          message: "Failed to read QR Code. Please try again.",
+          type: MessageType.error);
+    });
   }
 
   Animation<double> verticalPosition;
@@ -59,7 +64,7 @@ class _MyAppState extends State<QRReader> with SingleTickerProviderStateMixin {
       home: new Scaffold(
         key: _scaffoldKey,
         appBar: new AppBar(
-          title: const Text('Fast QR reader example'),
+          title: const Text('Scan Bus'),
         ),
         floatingActionButton: FloatingActionButton(
           child: new Icon(Icons.check),
@@ -86,7 +91,7 @@ class _MyAppState extends State<QRReader> with SingleTickerProviderStateMixin {
                     width: 300.0,
                     child: Container(
                       decoration: BoxDecoration(
-                          border: Border.all(color: Colors.red, width: 2.0)),
+                          border: Border.all(color: Colors.green, width: 2.0)),
                     ),
                   ),
                   Positioned(
@@ -94,7 +99,7 @@ class _MyAppState extends State<QRReader> with SingleTickerProviderStateMixin {
                     child: Container(
                       width: 300.0,
                       height: 2.0,
-                      color: Colors.red,
+                      color: Colors.green,
                     ),
                   )
                 ],
@@ -126,9 +131,14 @@ class _MyAppState extends State<QRReader> with SingleTickerProviderStateMixin {
   }
 
   void onCodeRead(dynamic value) {
-    showInSnackBar(value.toString());
+    //showInSnackBar(value.toString());
     // ... do something
     // wait 5 seconds then start scanning again.
+    //Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  debugPrint("Book Ticket Navigation.");
+                  return BookTicket(value.toString());
+                }));
     new Future.delayed(const Duration(seconds: 5), controller.startScanning);
   }
 
@@ -146,12 +156,15 @@ class _MyAppState extends State<QRReader> with SingleTickerProviderStateMixin {
         showInSnackBar('Camera error ${controller.value.errorDescription}');
       }
     });
-
-    try {
-      await controller.initialize();
-    } on QRReaderException catch (e) {
-      logError(e.code, e.description);
-      showInSnackBar('Error: ${e.code}\n${e.description}');
+    bool isPermissionGranted = false;
+    while (!isPermissionGranted) {
+      try {
+        await controller.initialize();
+        isPermissionGranted = true;
+      } on QRReaderException catch (e) {
+        logError(e.code, e.description);
+        //showInSnackBar('Error: ${e.code}\n${e.description}');
+      }
     }
 
     if (mounted) {

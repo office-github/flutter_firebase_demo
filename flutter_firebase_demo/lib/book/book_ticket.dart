@@ -2,12 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/message_type.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:flutter_firebase_demo/user/current_user.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 
 class BookTicket extends StatefulWidget {
+  final String busInfo; //Bus Name, Busnumber
+
+  BookTicket(this.busInfo);
+
   @override
-  State<StatefulWidget> createState() => _BookState();
+  State<StatefulWidget> createState() => _BookState(this.busInfo);
 }
 
 class _BookState extends State<BookTicket> {
@@ -19,19 +24,37 @@ class _BookState extends State<BookTicket> {
   TextEditingController fairController = TextEditingController();
   TextEditingController discountController = TextEditingController();
   TextEditingController totalController = TextEditingController();
-  TextEditingController busNumberController = TextEditingController();
-  AutoCompleteTextField<String> busNumberFilerField;
-  List<String> busNumbers = List<String>();
+  TextEditingController busInfoController = TextEditingController();
+  final TextEditingController _typeAheadController = TextEditingController();
+  String _selectedCity;
+  final String busInfo;
+  //AutoCompleteTextField<String> busNumberFilerField;
+  //List<String> busNumbers = List<String>();
+  List<String> busRoutes = List<String>();
+
+  _BookState(this.busInfo);
 
   @override
   void initState() {
-    CollectionReference reference = Firestore.instance.collection('Bus');
+    busInfoController.text = this.busInfo;
+    /*CollectionReference reference = Firestore.instance.collection('Bus');
     reference.getDocuments().then((snapshot) {
       snapshot.documents.forEach((document) {
-        busNumbers.add(document["number"]);
+        busNumbers.add(document["name"] + "," + document["number"]);
       });
     }).catchError((e, s) {
-      print(e + s);
+      print(e);
+      print(s);
+    });*/
+
+    CollectionReference ref = Firestore.instance.collection('Route');
+     ref.getDocuments().then((snapshot) {
+      snapshot.documents.forEach((document) {
+        busRoutes.add(document["place"]);
+      });
+    }).catchError((e, s) {
+      print(e);
+      print(s);
     });
     super.initState();
   }
@@ -55,10 +78,10 @@ class _BookState extends State<BookTicket> {
           children: <Widget>[
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getBusNumberAutoCompleteTextField()),
+                child: getBusInfoTextField()),
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getSourceTextField()),
+                child: getSourceTypeAheadField()),
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getDestinationTextField()),
@@ -99,7 +122,7 @@ class _BookState extends State<BookTicket> {
   void payFair() {
     int id = 0;
     int userId = CurrentUser.id;
-    String busNumber = busNumberController.text;
+    String busNumber = busInfoController.text;
     String source = sourceController.text;
     String destination = destinationController.text;
     double fair = double.parse(fairController.text);
@@ -136,7 +159,7 @@ class _BookState extends State<BookTicket> {
     Navigator.pop(context);
   }
 
-  getBusNumberAutoCompleteTextField() {
+  /*getBusNumberAutoCompleteTextField() {
     return busNumberFilerField = AutoCompleteTextField<String>(
       key: busNumberTextFieldKey,
       clearOnSubmit: false,
@@ -162,7 +185,7 @@ class _BookState extends State<BookTicket> {
         return row(item);
       },
     );
-  }
+  }*/
 
   Widget row(String busNumber) {
     return Row(
@@ -176,20 +199,51 @@ class _BookState extends State<BookTicket> {
     );
   }
 
-  getSourceTextField() {
+  getSourceTypeAheadField() {
+    return TypeAheadFormField(
+          textFieldConfiguration: TextFieldConfiguration(
+            controller: this._typeAheadController,
+            decoration: InputDecoration(
+              labelText: 'City'
+            )
+          ),          
+          suggestionsCallback: (pattern) {
+            return getBusRoutes(pattern);
+          },
+          itemBuilder: (context, suggestion) {
+            return ListTile(
+              title: Text(suggestion),
+            );
+          },
+          transitionBuilder: (context, suggestionsBox, controller) {
+            return suggestionsBox;
+          },
+          onSuggestionSelected: (suggestion) {
+            this._typeAheadController.text = suggestion;
+          },
+          validator: (value) {
+            if (value.isEmpty) {
+              return 'Please select a city';
+            }
+          },
+          onSaved: (value) => this._selectedCity = value,
+        );
+  }
+  getBusInfoTextField() {
     return TextFormField(
+      enabled: false,
       keyboardType: TextInputType.text,
       style: TextStyle(fontSize: 14.0),
       textInputAction: TextInputAction.next,
-      controller: sourceController,
+      controller: busInfoController,
       validator: (String value) {
         if (value.isEmpty) {
-          return "Source Required";
+          return "Bus Information Required";
         }
       },
       decoration: InputDecoration(
-          labelText: "Source",
-          hintText: "Please Enter Source",
+          labelText: "Bus Information",
+          hintText: "Please Enter Bus Information",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
     );
   }
@@ -264,5 +318,26 @@ class _BookState extends State<BookTicket> {
           hintText: "Please Enter Total Fair",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
     );
+  }
+
+  getBusRoutes(String pattern) async {
+    List<String> places = new List<String>();
+
+    if(busRoutes != null) {
+      busRoutes.forEach((place) {
+        if(place.toLowerCase().contains(pattern.toLowerCase())) {
+          places.add(place); 
+        }
+      });
+    }
+    else {
+      places.add("Loading...");
+    }
+    
+    if (places.length == 0) {
+      places.add("Not found");
+    }
+
+    return places;
   }
 }

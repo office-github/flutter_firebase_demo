@@ -3,6 +3,7 @@ import 'package:flutter_firebase_demo/book/book_ticket.dart';
 import 'package:flutter_firebase_demo/book/ticket_information.dart';
 import 'package:flutter_firebase_demo/bus/bus_information.dart';
 import 'package:flutter_firebase_demo/bus/insert_bus.dart';
+import 'package:flutter_firebase_demo/qr/qr_reader.dart';
 import 'package:flutter_firebase_demo/route/insert_route.dart';
 import 'package:flutter_firebase_demo/route/route_information.dart';
 import 'package:flutter_firebase_demo/user/user_type.dart';
@@ -33,7 +34,7 @@ class _NormalMenuState extends State<NormalMenu> {
       viewBasedOnUser = UserInformation();
     } else {
       this.appTitle = "Pay Fair";
-      viewBasedOnUser = BookTicket();
+      viewBasedOnUser = QRReader();
     }
     super.initState();
   }

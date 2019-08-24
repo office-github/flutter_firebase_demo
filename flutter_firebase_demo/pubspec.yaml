@@ -27,6 +27,7 @@ dependencies:
   autocomplete_textfield: ^1.7.3
   qr_flutter: ^2.1.0
   fast_qr_reader_view: ^0.1.5
+  flutter_typeahead: ^1.6.1
 
 dev_dependencies:
   flutter_test:
