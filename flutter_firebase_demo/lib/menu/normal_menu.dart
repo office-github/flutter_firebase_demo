@@ -176,13 +176,14 @@ class _NormalMenuState extends State<NormalMenu> {
         ListTile(
           title: Text('Show Ticket Information'),
           onTap: () {
+            showCircularProgressBar(context);
             CollectionReference reference =
                 Firestore.instance.collection('Book');
             reference
                 .where("userId", isEqualTo: CurrentUser.email.toLowerCase())
                 .getDocuments()
                 .then((snapshot) {
-              //Navigator.pop(context);
+              Navigator.pop(context);
               if (snapshot.documents.length > 0) {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   debugPrint("Show Ticekt Information Navigation.");

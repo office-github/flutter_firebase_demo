@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/general/message_type.dart';
 
-Future<Null> showMessageDialog(
+Future<void> showMessageDialog(
     {BuildContext context, String title, String message, MessageType type}) {
   Color color = Colors.greenAccent;
 
