@@ -64,10 +64,10 @@ class _MyHomePageState extends State<BusInformation> {
             borderRadius: BorderRadius.circular(5.0),
           ),
           child: ListTile(
-            title: Text(record.number),
+            title: Text(record.name + ", " + record.number),
             trailing: Text(record.owner),
             subtitle: Text(
-                "Routes: ${record.routes}\nTotal Fair: ${record.totalFair}\nDiscount: ${record.discount} %\n Bonus: ${record.bonus}"),
+                "Routes: Discount: ${record.discount} %\nBonus: ${record.bonus} %\nTotal Fair: ${record.totalFair}"),
             // onTap: () => Firestore.instance.runTransaction((transaction) async {
             //       final freshSnapshot = await transaction.get(record.reference);
             //       final fresh = Record.fromSnapshot(freshSnapshot);

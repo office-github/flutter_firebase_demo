@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/message_type.dart';
+import 'package:uuid/uuid.dart';
 
 class InsertBus extends StatefulWidget {
   @override
@@ -16,7 +17,6 @@ class _BusState extends State<InsertBus> {
   TextEditingController discountController = TextEditingController();
   TextEditingController bonusController = TextEditingController();
   TextEditingController totalFairController = TextEditingController();
-  TextEditingController routesController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class _BusState extends State<InsertBus> {
         },
         child: Scaffold(
             appBar: AppBar(
-              title: Text("Add BUs Information"),
+              title: Text("Add Bus Information"),
               leading: IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () {
@@ -64,9 +64,6 @@ class _BusState extends State<InsertBus> {
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getBonusTextField()),
             Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getRoutesTextField()),
-            Padding(
               padding: EdgeInsets.only(
                   top: 10.0, bottom: 10.0, left: 50.0, right: 50.0),
               child: RaisedButton(
@@ -99,9 +96,8 @@ class _BusState extends State<InsertBus> {
     double discount = double.parse(discountController.text);
     double bonus = double.parse(bonusController.text);
     double totalFair = double.parse(totalFairController.text);
-    String routes = routesController.text;
 
-    debugPrint("Bus Number: $number, Bus Routes: $routes");
+    debugPrint("Bus Number: $number, Bus Name: $name");
 
 //Get the firebase database collection refrence of the baby collection.
     try {
@@ -120,14 +116,15 @@ class _BusState extends State<InsertBus> {
         } else {
           CollectionReference reference = Firestore.instance.collection('Bus');
           Map<String, dynamic> map = new Map();
+          //var uuid = new Uuid();
           map.addAll({
+            //"id": uuid.v1(),
             "number": number,
             "owner": owner,
             "name": name,
             "discount": discount,
             "bonus": bonus,
-            "totalFair": totalFair,
-            "routes": routes
+            "totalFair": totalFair
           });
 
           reference.add(map);
@@ -277,23 +274,6 @@ class _BusState extends State<InsertBus> {
       decoration: InputDecoration(
           labelText: "Owner Name",
           hintText: "Please Enter Owner Name",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-    );
-  }
-
-  getRoutesTextField() {
-    return TextFormField(
-      keyboardType: TextInputType.emailAddress,
-      style: TextStyle(fontSize: 14.0),
-      controller: routesController,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return "Routes Required";
-        }
-      },
-      decoration: InputDecoration(
-          labelText: "Routes",
-          hintText: "Please Enter Routes e.g. Balkhu, Kalanki",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
     );
   }

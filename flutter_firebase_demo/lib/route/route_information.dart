@@ -57,7 +57,7 @@ class _MyHomePageState extends State<RouteInformation> {
       final record = BusRoute.fromSnapshot(data);
 
       return Padding(
-        key: ValueKey(record.id),
+        key: ValueKey(record.place),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Container(
           decoration: BoxDecoration(
@@ -65,8 +65,7 @@ class _MyHomePageState extends State<RouteInformation> {
             borderRadius: BorderRadius.circular(5.0),
           ),
           child: ListTile(
-            title: Text("Bus Route ID: ${record.id}"),
-            trailing: Text(record.place),
+            title: Text("Bus Route: ${record.place}"),
             // onTap: () => Firestore.instance.runTransaction((transaction) async {
             //       final freshSnapshot = await transaction.get(record.reference);
             //       final fresh = Record.fromSnapshot(freshSnapshot);

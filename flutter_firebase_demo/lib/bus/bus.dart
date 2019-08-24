@@ -7,7 +7,6 @@ class Bus {
   double discount; //Percentage
   double bonus; //Percentage
   double totalFair; //double value
-  String routes; //Comma separated values of strings
   final DocumentReference reference;
 
   Bus.fromMap(Map<String, dynamic> map, {this.reference})
@@ -17,14 +16,12 @@ class Bus {
         assert(map['discount'] != null),
         assert(map['bonus'] != null),
         assert(map['totalFair'] != null),
-        assert(map['routes'] != null),
         number = map['number'],
         owner = map['owner'],
         name = map['name'],
-        discount = map['discount'],
-        bonus = map['bonus'],
-        totalFair = map['totalFair'],
-        routes = map['routes'];
+        discount = double.parse(map['discount'].toString()),
+        bonus = double.parse(map['bonus'].toString()),
+        totalFair = double.parse(map['totalFair'].toString());
 
   Bus.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
