@@ -38,8 +38,37 @@ class _BookState extends State<BookTicket> {
     busInfoController.text = this.busInfo;
     List<String> busInfoAsList = this.busInfo.split(',');
     CollectionReference reference = Firestore.instance.collection('Bus');
-    reference.where("number", isEqualTo: busInfoAsList[0]).getDocuments().then((snapshot) {
+    reference
+        .where("number", isEqualTo: busInfoAsList[0])
+        .getDocuments()
+        .then((snapshot) {
+      if (snapshot.documents.length > 0) {
         discountController.text = snapshot.documents[0].data["discount"];
+      } else {
+        discountController.text = "0.0";
+      }
+
+      fairController.addListener(() {
+        //here you have the changes of your textfield
+        print("value: ${fairController.text}");
+        //use setState to rebuild the widget
+        setState(() {
+          double discount = discountController?.text == null
+              ? 0.0
+              : double.parse(discountController.text);
+          double fair = fairController.text == "" || fairController.text == null
+              ? 0.0
+              : double.parse(fairController.text);
+
+          if (discount > 0) {
+            double total = fair * discount / 100;
+            totalController.text = total.toString();
+          } else {
+            totalController.text = fairController.text;
+          }
+        });
+      });
+      super.initState();
     }).catchError((e, s) {
       print(e);
       print(s);
@@ -137,27 +166,64 @@ class _BookState extends State<BookTicket> {
     debugPrint("userId: $userId, Bus Number: $busId");
 
 //Get the firebase database collection refrence of the baby collection.
-    CollectionReference reference = Firestore.instance.collection('Book');
-    Map<String, dynamic> map = new Map();
-    map.addAll({
-      "id": id,
-      "userId": userId,
-      "busId": busId,
-      "source": source,
-      "destination": destination,
-      "fair": fair,
-      "discount": discount,
-      "totalFair": totalFair
-    });
+    Firestore.instance.runTransaction((transaction) async {
+      final QuerySnapshot snapshot = await Firestore.instance
+          .collection('User')
+          .where("id", isEqualTo: CurrentUser.id)
+          .getDocuments();
 
-    reference.add(map);
+      CollectionReference reference = Firestore.instance.collection('Book');
+      Map<String, dynamic> map = new Map();
+      map.addAll({
+        "id": id,
+        "userId": userId,
+        "busId": busId,
+        "source": source,
+        "destination": destination,
+        "fair": fair,
+        "discount": discount,
+        "totalFair": totalFair
+      });
+
+      reference.add(map);
+
+      if (snapshot.documents.length > 0) {
+        double remainingFair = 0;
+        double finalAmount = 0;
+        double finalBonus = 0;
+
+        if (CurrentUser.amount <= totalFair) {
+          remainingFair = totalFair - CurrentUser.amount;
+          finalAmount = 0;
+          CurrentUser.amount = 0;
+        }
+
+        if (finalAmount == 0 && remainingFair > 0) {
+          finalBonus = CurrentUser.bonus - remainingFair;
+          CurrentUser.bonus = finalBonus;
+        }
+
+        await transaction.update(snapshot.documents[0].reference,
+            {'amount': finalAmount, 'bonus': finalBonus});
+      }
+    }).whenComplete(() {
     debugPrint("Saved Successfully.");
-    back(context);
+    //back(context);
     showMessageDialog(
         context: context,
         title: "Success",
-        message: "Registration Successful",
+        message: "Ticket Booked Successfully",
         type: MessageType.success);
+    }).catchError((e, s) {
+      print(e);
+      print(s);
+      //back(context);
+    showMessageDialog(
+        context: context,
+        title: "Failed",
+        message: "Ticked Booking Failed, Please Try again.",
+        type: MessageType.error);
+    });
   }
 
   void back(BuildContext context) {
@@ -205,10 +271,9 @@ class _BookState extends State<BookTicket> {
       validator: (value) {
         if (value.isEmpty) {
           return 'Please select a city';
-        } else if(value == _destinationTypeAheadController.text) {
+        } else if (value == _destinationTypeAheadController.text) {
           return "Source and Destination Cannot be same";
-        }
-         else if (value == "Not Available") {
+        } else if (value == "Not Available") {
           this._sourceTypeAheadController.text = "";
         }
       },
@@ -242,7 +307,7 @@ class _BookState extends State<BookTicket> {
       validator: (value) {
         if (value.isEmpty) {
           return 'Please select a city';
-        } else if(value == _sourceTypeAheadController.text) {
+        } else if (value == _sourceTypeAheadController.text) {
           return "Source and Destination Cannot be same";
         }
       },
@@ -257,13 +322,12 @@ class _BookState extends State<BookTicket> {
       textInputAction: TextInputAction.next,
       controller: fairController,
       validator: (String value) {
-        double discount = discountController.text == null ? 0.0 : double.parse(discountController.text);
+        double total = CurrentUser.bonus + CurrentUser.amount;
+
         if (value.isEmpty) {
           return "Fair Required";
-        }
-        else if(discount > 0) {
-          double total = double.parse(value) * discount / 100;
-          totalController.text = total.toString();
+        } else if (double.parse(totalController.text) > total) {
+          return "Insufficient Balance";
         }
       },
       decoration: InputDecoration(

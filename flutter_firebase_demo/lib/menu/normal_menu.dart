@@ -80,7 +80,14 @@ class _NormalMenuState extends State<NormalMenu> {
       if (CurrentUser.userType == UserType.admin) {
         return <Widget>[
           DrawerHeader(
-            child: Text('Profile Picture'),
+            child: Row(
+              children: <Widget>[
+                Text("Email: " + CurrentUser.email + "\nPhone No.: " + CurrentUser.phoneNo.toString() + "\n\nAmount Rs." +
+                    CurrentUser.amount.toString() +
+                    "\nBonus Rs." +
+                    CurrentUser.bonus.toString()),
+              ],
+            ),
             decoration: BoxDecoration(
               color: Colors.blue,
             ),
@@ -168,7 +175,14 @@ class _NormalMenuState extends State<NormalMenu> {
 
       return <Widget>[
         DrawerHeader(
-          child: Text('Profile Picture'),
+          child: Row(
+            children: <Widget>[
+              Text("Email: " + CurrentUser.email + "\nPhone No.: " + CurrentUser.phoneNo.toString() + "\n\nAmount Rs. : " +
+                  CurrentUser.amount.toString() +
+                  "\nBonus Rs. : " +
+                  CurrentUser.bonus.toString()),
+            ],
+          ),
           decoration: BoxDecoration(
             color: Colors.blue,
           ),
@@ -191,11 +205,10 @@ class _NormalMenuState extends State<NormalMenu> {
                 }));
               } else {
                 showMessageDialog(
-                  context: context,
-                  title: "Ticket Information",
-                  message: "You Have Not Booked Any Ticket",
-                  type: MessageType.warning
-                );
+                    context: context,
+                    title: "Ticket Information",
+                    message: "You Have Not Booked Any Ticket",
+                    type: MessageType.warning);
               }
             });
           },

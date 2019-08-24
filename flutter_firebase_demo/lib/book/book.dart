@@ -25,9 +25,9 @@ class Book {
         busId = map['busId'],
         source = map['source'],
         destination = map['destination'],
-        fair = map['fair'],
-        discount = map['discount'],
-        totalFair = map['totalFair'];
+        fair = double.parse(map['fair'].toString()),
+        discount = double.parse(map['discount'].toString()),
+        totalFair = double.parse(map['totalFair'].toString());
 
   Book.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);

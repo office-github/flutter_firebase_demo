@@ -7,6 +7,8 @@ class User {
   final String email;
   final int phoneNo;
   final String password;
+  final double bonus; //Amount in Rs.
+  final double amount; //Amount in wallet
   final DocumentReference reference;
 
   User.fromMap(Map<String, dynamic> map, {this.reference})
@@ -21,7 +23,9 @@ class User {
         fullName = map['fullName'],
         email = map['email'],
         phoneNo = map['phoneNo'],
-        password = map['password'];
+        password = map['password'],
+        bonus = double.parse(map['bonus'].toString()),
+        amount = double.parse(map['amount'].toString());
 
   User.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);

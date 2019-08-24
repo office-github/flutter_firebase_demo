@@ -4,6 +4,7 @@ import 'package:fast_qr_reader_view/fast_qr_reader_view.dart';
 import 'package:flutter_firebase_demo/book/book_ticket.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/message_type.dart';
+import 'package:flutter_firebase_demo/user/current_user.dart';
 
 List<CameraDescription> cameras;
 
@@ -131,6 +132,16 @@ class _MyAppState extends State<QRReader> with SingleTickerProviderStateMixin {
     //showInSnackBar(value.toString());
     // ... do something
     // wait 5 seconds then start scanning again.
+    if(CurrentUser.amount < 1 && CurrentUser.bonus < 1) {
+      showMessageDialog(
+        context: context,
+        title: "Balance Information",
+        message: "Insufficient Balance",
+        type: MessageType.error
+      );
+      return;
+    }
+
     Navigator.pop(context);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       debugPrint("Book Ticket Navigation.");
