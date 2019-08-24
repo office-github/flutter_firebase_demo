@@ -10,6 +10,7 @@ class _BusState extends State<InsertBus> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController numberController = TextEditingController();
   TextEditingController ownerController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
   TextEditingController discountController = TextEditingController();
   TextEditingController bonusController = TextEditingController();
   TextEditingController totalFairController = TextEditingController();
@@ -44,7 +45,10 @@ class _BusState extends State<InsertBus> {
           children: <Widget>[
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getNumberDropDown()),
+                child: getNumberTextField()),
+            Padding(
+                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                child: getNameTextField()),
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getOwnerTextField()),
@@ -82,6 +86,7 @@ class _BusState extends State<InsertBus> {
   void save() {
     String number = numberController.text;
     String owner = ownerController.text;
+    String name = nameController.text;
     double discount = double.parse(discountController.text);
     double bonus = double.parse(bonusController.text);
     double totalFair = double.parse(totalFairController.text);
@@ -95,6 +100,7 @@ class _BusState extends State<InsertBus> {
     map.addAll({
       "number": number,
       "owner": owner,
+      "name": name,
       "discount": discount,
       "bonus": bonus,
       "totalFair": totalFair,
@@ -181,7 +187,24 @@ class _BusState extends State<InsertBus> {
     );
   }
 
-  getNumberDropDown() {
+getNameTextField() {
+  return TextFormField(
+    keyboardType: TextInputType.number,
+    style: TextStyle(fontSize: 14.0),
+    controller: nameController,
+    validator: (String value) {
+      if (value.isEmpty) {
+        return "Bus Name Required";
+      }
+    },
+    decoration: InputDecoration(
+        labelText: "Bus Name",
+        hintText: "Please Enter Bus Name",
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+  );
+}
+
+  getNumberTextField() {
     return TextFormField(
       keyboardType: TextInputType.number,
       style: TextStyle(fontSize: 14.0),

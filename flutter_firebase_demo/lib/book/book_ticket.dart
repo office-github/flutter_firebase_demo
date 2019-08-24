@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
-import 'package:flutter_firebase_demo/general/message-type.dart';
-import 'package:flutter_firebase_demo/user/current-user.dart';
+import 'package:flutter_firebase_demo/general/message_type.dart';
+import 'package:flutter_firebase_demo/user/current_user.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 
 class BookTicket extends StatefulWidget {

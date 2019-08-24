@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Bus {
   String number; //Unique
+  String name;
   String owner; //Company or owner person
   double discount; //Percentage
   double bonus; //Percentage
@@ -12,12 +13,14 @@ class Bus {
   Bus.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map['number'] != null),
         assert(map['owner'] != null),
+        assert(map['name'] != null),
         assert(map['discount'] != null),
         assert(map['bonus'] != null),
         assert(map['totalFair'] != null),
         assert(map['routes'] != null),
         number = map['number'],
         owner = map['owner'],
+        name = map['name'],
         discount = map['discount'],
         bonus = map['bonus'],
         totalFair = map['totalFair'],

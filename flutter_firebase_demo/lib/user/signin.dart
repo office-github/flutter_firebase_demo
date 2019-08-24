@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/back.dart';
-import 'package:flutter_firebase_demo/general/message-type.dart';
-import 'package:flutter_firebase_demo/menu/gridview-menu.dart';
-import 'package:flutter_firebase_demo/menu/normal-menu.dart';
-import 'package:flutter_firebase_demo/user/UserType.dart';
-import 'package:flutter_firebase_demo/user/current-user.dart';
-import 'package:flutter_firebase_demo/user/password-operation.dart';
+import 'package:flutter_firebase_demo/general/message_type.dart';
+import 'package:flutter_firebase_demo/menu/gridview_menu.dart';
+import 'package:flutter_firebase_demo/menu/normal_menu.dart';
+import 'package:flutter_firebase_demo/user/user_type.dart';
+import 'package:flutter_firebase_demo/user/current_user.dart';
+import 'package:flutter_firebase_demo/user/password_operation.dart';
 import 'package:flutter_firebase_demo/user/password.dart';
 import 'package:flutter_firebase_demo/user/register.dart';
 

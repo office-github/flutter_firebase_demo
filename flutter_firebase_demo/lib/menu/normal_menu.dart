@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_firebase_demo/book/book-ticket.dart';
-import 'package:flutter_firebase_demo/book/ticket-information.dart';
-import 'package:flutter_firebase_demo/bus/bus-information.dart';
-import 'package:flutter_firebase_demo/bus/insert-bus.dart';
-import 'package:flutter_firebase_demo/route/insert-route.dart';
-import 'package:flutter_firebase_demo/route/route-information.dart';
-import 'package:flutter_firebase_demo/user/UserType.dart';
+import 'package:flutter_firebase_demo/book/book_ticket.dart';
+import 'package:flutter_firebase_demo/book/ticket_information.dart';
+import 'package:flutter_firebase_demo/bus/bus_information.dart';
+import 'package:flutter_firebase_demo/bus/insert_bus.dart';
+import 'package:flutter_firebase_demo/route/insert_route.dart';
+import 'package:flutter_firebase_demo/route/route_information.dart';
+import 'package:flutter_firebase_demo/user/user_type.dart';
 import 'package:flutter_firebase_demo/user/register.dart';
-import 'package:flutter_firebase_demo/user/user-information.dart';
+import 'package:flutter_firebase_demo/user/user_information.dart';
 
 class NormalMenu extends StatefulWidget {
   final String userType;

@@ -25,6 +25,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   cloud_firestore: ^0.12.7
   autocomplete_textfield: ^1.7.3
+  qr_flutter: ^2.1.0
 
 dev_dependencies:
   flutter_test:

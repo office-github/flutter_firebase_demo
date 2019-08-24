@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/back.dart';
-import 'package:flutter_firebase_demo/general/message-type.dart';
-import 'package:flutter_firebase_demo/user/UserType.dart';
+import 'package:flutter_firebase_demo/general/message_type.dart';
+import 'package:flutter_firebase_demo/user/user_type.dart';
 
 class Register extends StatefulWidget {
   final String userType;

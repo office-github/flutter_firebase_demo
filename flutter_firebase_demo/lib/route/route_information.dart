@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/general/back.dart';
 
-import 'bus-route.dart';
+import 'bus_route.dart';
 
 class RouteInformation extends StatefulWidget {
   @override
