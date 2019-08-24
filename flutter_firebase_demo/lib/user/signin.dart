@@ -73,9 +73,7 @@ class _SignInState extends State<SignIn> {
         .getDocuments()
         .then((snapshot) {
       if (snapshot.documents.length > 0) {
-        CurrentUser.id = snapshot.documents[0].data["id"];
-        CurrentUser.userType = snapshot.documents[0].data[UserType.text];
-        CurrentUser.userName = snapshot.documents[0].data["userName"];
+        CurrentUser.signIn(snapshot.documents[0]);
         redirectToPage();
       } else {
         reference
@@ -84,9 +82,7 @@ class _SignInState extends State<SignIn> {
             .getDocuments()
             .then((snapshot) {
           if (snapshot.documents.length > 0) {
-            CurrentUser.id = snapshot.documents[0].data["id"];
-            CurrentUser.userType = snapshot.documents[0].data[UserType.text];
-            CurrentUser.userName = snapshot.documents[0].data["userName"];
+            CurrentUser.signIn(snapshot.documents[0]);
             redirectToPage();
           } else {
             back(context);
@@ -99,7 +95,8 @@ class _SignInState extends State<SignIn> {
         });
       }
     }).catchError((e, s) {
-      print(e + s);
+      print(e);
+      print(s);
       back(context);
       showMessageDialog(
           context: context,
@@ -108,9 +105,7 @@ class _SignInState extends State<SignIn> {
           type: MessageType.error);
     });
 */
-    CurrentUser.id = 1;
-    CurrentUser.userName = "a@a.com";
-    CurrentUser.userType = UserType.user;
+    CurrentUser.signInForDemo(UserType.user);
     redirectToPage();
   }
 
@@ -119,7 +114,7 @@ class _SignInState extends State<SignIn> {
     back(context);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       debugPrint("Signed In Successfully.");
-      return NormalMenu(userType: UserType.user);
+      return NormalMenu();
       //return NormalMenu(userType: users.documents[0].data[UserType.text]);
       //return GridViewMenu();
     }));
@@ -206,9 +201,7 @@ class _SignInState extends State<SignIn> {
         debugPrint("Register Clicked from Signin Page");
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           passwordController.text = "";
-          return Register(
-            userType: UserType.user,
-          );
+          return Register();
         }));
       },
     );

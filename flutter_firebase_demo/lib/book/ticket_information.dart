@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/book/book.dart';
 import 'package:flutter_firebase_demo/general/back.dart';
+import 'package:flutter_firebase_demo/user/current_user.dart';
+import 'package:flutter_firebase_demo/user/user_type.dart';
 
 class TicketInformation extends StatefulWidget {
   @override
@@ -27,8 +29,8 @@ class _MyHomePageState extends State<TicketInformation> {
               },
             ),
           ),
-          //body: _buildBody(context),
-          body: Text("Ticket Information"),
+          body: _buildBody(context),
+          //body: Text("Ticket Information"),
         ));
   }
 
@@ -63,23 +65,36 @@ class _MyHomePageState extends State<TicketInformation> {
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(5.0),
           ),
-          child: ListTile(
-            title: Text("User ID: ${record.userId}, Bus ID: ${record.busId}"),
-            trailing: Text("Rs. ${record.totalFair}"),
-            subtitle: Text(
-                "Source: ${record.source}\nDestination: ${record.destination}"),
-            // onTap: () => Firestore.instance.runTransaction((transaction) async {
-            //       final freshSnapshot = await transaction.get(record.reference);
-            //       final fresh = Record.fromSnapshot(freshSnapshot);
+          child: getTicketInformation(record),
+          // onTap: () => Firestore.instance.runTransaction((transaction) async {
+          //       final freshSnapshot = await transaction.get(record.reference);
+          //       final fresh = Record.fromSnapshot(freshSnapshot);
 
-            //       await transaction
-            //           .update(record.reference, {'votes': fresh.votes + 1});
-            //     }),
-          ),
+          //       await transaction
+          //           .update(record.reference, {'votes': fresh.votes + 1});
+          //     }),
         ),
       );
     } catch (e) {
       debugPrint(e);
     }
+  }
+
+  ListTile getTicketInformation(Book record) {
+    if (CurrentUser.userType == UserType.user) {
+      if (CurrentUser.email == record.userId) {
+        return ListTile(
+            title: Text("User ID: ${record.userId}, Bus ID: ${record.busId}"),
+            trailing: Text("Rs. ${record.totalFair}"),
+            subtitle: Text(
+                "Source: ${record.source}\nDestination: ${record.destination}"));
+      }
+    }
+
+    return ListTile(
+        title: Text("User ID: ${record.userId}, Bus ID: ${record.busId}"),
+        trailing: Text("Rs. ${record.totalFair}"),
+        subtitle: Text(
+            "Source: ${record.source}\nDestination: ${record.destination}"));
   }
 }

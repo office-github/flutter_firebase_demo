@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/message_type.dart';
+import 'package:flutter_firebase_demo/qr/qr_generator.dart';
 import 'package:uuid/uuid.dart';
 
 class InsertBus extends StatefulWidget {
@@ -106,7 +107,7 @@ class _BusState extends State<InsertBus> {
           .where("number", isEqualTo: number.toUpperCase())
           .getDocuments()
           .then((snapshot) {
-                back(context);
+        back(context);
         if (snapshot.documents.length > 0) {
           showMessageDialog(
               context: context,
@@ -128,15 +129,10 @@ class _BusState extends State<InsertBus> {
           });
 
           reference.add(map);
-              back(context);
-          showMessageDialog(
-                  context: context,
-                  title: "Bus Information",
-                  message: "Bus Information Added Successfylly",
-                  type: MessageType.success)
-              .then((s) {
-            back(context);
-          });
+          back(context);
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return QrGenerator(number + ", " + name);
+          }));
           debugPrint("Saved Successfully.");
         }
       });

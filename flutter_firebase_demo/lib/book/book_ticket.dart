@@ -36,15 +36,14 @@ class _BookState extends State<BookTicket> {
   @override
   void initState() {
     busInfoController.text = this.busInfo;
-    /*CollectionReference reference = Firestore.instance.collection('Bus');
-    reference.getDocuments().then((snapshot) {
-      snapshot.documents.forEach((document) {
-        busNumbers.add(document["name"] + "," + document["number"]);
-      });
+    List<String> busInfoAsList = this.busInfo.split(',');
+    CollectionReference reference = Firestore.instance.collection('Bus');
+    reference.where("number", isEqualTo: busInfoAsList[0]).getDocuments().then((snapshot) {
+        discountController.text = snapshot.documents[0].data["discount"];
     }).catchError((e, s) {
       print(e);
       print(s);
-    });*/
+    });
 
     super.initState();
   }
@@ -55,7 +54,7 @@ class _BookState extends State<BookTicket> {
         onWillPop: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             debugPrint("Book Ticket Navigation.");
-            return NormalMenu(userType: CurrentUser.userType);
+            return NormalMenu();
           }));
         },
         child: Scaffold(
@@ -66,7 +65,7 @@ class _BookState extends State<BookTicket> {
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     debugPrint("Book Ticket Navigation.");
-                    return NormalMenu(userType: CurrentUser.userType);
+                    return NormalMenu();
                   }));
                 },
               ),
@@ -127,23 +126,23 @@ class _BookState extends State<BookTicket> {
 //Add record to the firebase database.
   void payFair() {
     int id = 0;
-    int userId = CurrentUser.id;
-    String busNumber = busInfoController.text;
+    String userId = CurrentUser.email;
+    String busId = busInfoController.text;
     String source = _sourceTypeAheadController.text;
     String destination = _destinationTypeAheadController.text;
     double fair = double.parse(fairController.text);
     double discount = double.parse(discountController.text);
     double totalFair = double.parse(totalController.text);
 
-    debugPrint("userId: $userId, Bus Number: $busNumber");
+    debugPrint("userId: $userId, Bus Number: $busId");
 
 //Get the firebase database collection refrence of the baby collection.
-    /*CollectionReference reference = Firestore.instance.collection('Book');
+    CollectionReference reference = Firestore.instance.collection('Book');
     Map<String, dynamic> map = new Map();
     map.addAll({
       "id": id,
       "userId": userId,
-      "busNumber": busNumber,
+      "busId": busId,
       "source": source,
       "destination": destination,
       "fair": fair,
@@ -158,7 +157,7 @@ class _BookState extends State<BookTicket> {
         context: context,
         title: "Success",
         message: "Registration Successful",
-        type: MessageType.success);*/
+        type: MessageType.success);
   }
 
   void back(BuildContext context) {
@@ -206,7 +205,10 @@ class _BookState extends State<BookTicket> {
       validator: (value) {
         if (value.isEmpty) {
           return 'Please select a city';
-        } else if (value == "Not Available") {
+        } else if(value == _destinationTypeAheadController.text) {
+          return "Source and Destination Cannot be same";
+        }
+         else if (value == "Not Available") {
           this._sourceTypeAheadController.text = "";
         }
       },
@@ -240,6 +242,8 @@ class _BookState extends State<BookTicket> {
       validator: (value) {
         if (value.isEmpty) {
           return 'Please select a city';
+        } else if(value == _sourceTypeAheadController.text) {
+          return "Source and Destination Cannot be same";
         }
       },
       onSaved: (value) => this._selectedCity = value,
@@ -253,8 +257,13 @@ class _BookState extends State<BookTicket> {
       textInputAction: TextInputAction.next,
       controller: fairController,
       validator: (String value) {
+        double discount = discountController.text == null ? 0.0 : double.parse(discountController.text);
         if (value.isEmpty) {
           return "Fair Required";
+        }
+        else if(discount > 0) {
+          double total = double.parse(value) * discount / 100;
+          totalController.text = total.toString();
         }
       },
       decoration: InputDecoration(
@@ -267,6 +276,7 @@ class _BookState extends State<BookTicket> {
   getDiscountTextField() {
     return TextFormField(
       keyboardType: TextInputType.number,
+      enabled: false,
       style: TextStyle(fontSize: 14.0),
       textInputAction: TextInputAction.next,
       controller: discountController,
@@ -285,6 +295,7 @@ class _BookState extends State<BookTicket> {
   getTotalFairTextField() {
     return TextFormField(
       keyboardType: TextInputType.number,
+      enabled: false,
       style: TextStyle(fontSize: 14.0),
       textInputAction: TextInputAction.done,
       controller: totalController,

@@ -34,6 +34,7 @@ Future<Null> showMessageDialog(
 showCircularProgressBar(BuildContext context) {
   return showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return Center(
           child: CircularProgressIndicator(),

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Book {
   int id;
-  int userId;
+  String userId; //Here, userId is email
   String busId; //Combination of Bus Number and Bus Name, used for qr code genrator
   String source;
   String destination;

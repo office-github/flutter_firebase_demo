@@ -3,15 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/back.dart';
 import 'package:flutter_firebase_demo/general/message_type.dart';
+import 'package:flutter_firebase_demo/user/current_user.dart';
 import 'package:flutter_firebase_demo/user/user_type.dart';
 
 class Register extends StatefulWidget {
-  final String userType;
-
-  Register({this.userType});
-
   @override
-  State<StatefulWidget> createState() => _RegisterState(this.userType);
+  State<StatefulWidget> createState() => _RegisterState();
 }
 
 class _RegisterState extends State<Register> {
@@ -22,11 +19,8 @@ class _RegisterState extends State<Register> {
   TextEditingController phoneNoController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController repassWordController = TextEditingController();
-  final String userType;
   String selectedUserType = UserType.user;
   bool validateForm = true;
-
-  _RegisterState(this.userType);
 
   @override
   Widget build(BuildContext context) {
@@ -44,17 +38,17 @@ class _RegisterState extends State<Register> {
                 },
               ),
             ),
-            body: getForm(this.userType)));
+            body: getForm()));
   }
 
-  Widget getForm(userType) {
+  Widget getForm() {
     return Form(
       key: _formKey,
       autovalidate: validateForm,
       child: Padding(
         padding: EdgeInsets.all(10.0),
         child: ListView(
-          children: getRegisterWidget(userType),
+          children: getRegisterWidget(),
         ),
       ),
     );
@@ -258,8 +252,8 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  List<Widget> getRegisterWidget(userType) {
-    if (userType == UserType.admin) {
+  List<Widget> getRegisterWidget() {
+    if (CurrentUser.userType == UserType.admin) {
       return [
         Padding(
             padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
