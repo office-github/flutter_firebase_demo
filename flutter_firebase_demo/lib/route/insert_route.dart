@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_demo/dialog/dialog.dart';
+import 'package:flutter_firebase_demo/general/message_type.dart';
 
 class InsertRoute extends StatefulWidget {
   @override
@@ -8,7 +10,6 @@ class InsertRoute extends StatefulWidget {
 
 class _RouteState extends State<InsertRoute> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController idController = TextEditingController();
   TextEditingController routeController = TextEditingController();
 
   @override
@@ -40,9 +41,6 @@ class _RouteState extends State<InsertRoute> {
           children: <Widget>[
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: getIdTextField()),
-            Padding(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getRouteTextField()),
             Padding(
               padding: EdgeInsets.only(
@@ -55,6 +53,7 @@ class _RouteState extends State<InsertRoute> {
                 onPressed: () {
                   setState(() {
                     if (_formKey.currentState.validate()) {
+                      showCircularProgressBar(context);
                       debugPrint("Add Clicked");
                       save();
                     }
@@ -70,54 +69,62 @@ class _RouteState extends State<InsertRoute> {
 
 //Add record to the firebase database.
   void save() {
-    int id = int.parse(idController.text);
-    String place = routeController.text;
+    String place = routeController.text.toUpperCase();
 
-    debugPrint("Name: $id, Vote: $place");
+    debugPrint("Route: $place");
 
 //Get the firebase database collection refrence of the baby collection.
-    CollectionReference reference = Firestore.instance.collection('Route');
-    Map<String, dynamic> map = new Map();
-    map.addAll({
-      "id": id,
-      "place": place,
-    });
-
-    reference.add(map);
-    debugPrint("Saved Successfully.");
+    try {
+      Firestore.instance
+          .collection('Route')
+          .where("place", isEqualTo: place)
+          .getDocuments()
+          .then((snapshot) {
+        back(context);
+        if (snapshot.documents.length > 0) {
+          showMessageDialog(
+              context: context,
+              title: "Route",
+              message: "Route Already Added.",
+              type: MessageType.warning);
+        } else {
+          CollectionReference reference =
+              Firestore.instance.collection('Route');
+          Map<String, dynamic> map = new Map();
+          map.addAll({
+            "place": place,
+          });
+          reference.add(map);
+          back(context);
+          showMessageDialog(
+                  context: context,
+                  title: "Route",
+                  message: "Route Added Successfylly",
+                  type: MessageType.success)
+              .then((s) {
+            back(context);
+          });
+          debugPrint("Route Saved Successfully.");
+        }
+      });
+    } catch (e, s) {
+      print(e);
+      print(s);
+      showMessageDialog(
+          context: context,
+          title: "Bus Information",
+          message: "Failed To Add Bus Information, Please try again.",
+          type: MessageType.error);
+    }
   }
 
   void back(BuildContext context) {
     Navigator.pop(context);
   }
 
-  getIdTextField() {
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      style: TextStyle(fontStyle: FontStyle.normal, fontSize: 14.0),
-      controller: idController,
-      validator: (String value) {
-        if (value.isEmpty) {
-          return "Id Required";
-        }
-      },
-      decoration: InputDecoration(
-          labelText: "Id",
-          hintText: "Please Enter Id",
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-      onEditingComplete: () {
-        setState(() {
-          if (_formKey.currentState.validate()) {
-            print("Valid");
-          }
-        });
-      },
-    );
-  }
-
   getRouteTextField() {
     return TextFormField(
-      keyboardType: TextInputType.number,
+      keyboardType: TextInputType.text,
       style: TextStyle(fontSize: 14.0),
       controller: routeController,
       validator: (String value) {
