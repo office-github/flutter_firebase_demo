@@ -71,12 +71,14 @@ class _InsertWalletState extends State<InsertWallet> {
             title: "Add Money To Wallet",
             message: "Money Added successfully.",
             type: MessageType.success);
+            back(context);
       } else {
         await showMessageDialog(
             context: context,
             title: "Add Money To Wallet",
             message: "Invalid User Name.",
             type: MessageType.error);
+            back(context);
       }
     }).catchError((error, s) {
       print(error);

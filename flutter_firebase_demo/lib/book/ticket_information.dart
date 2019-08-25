@@ -58,7 +58,7 @@ class _MyHomePageState extends State<TicketInformation> {
       final record = Book.fromSnapshot(data);
 
       return Padding(
-        key: ValueKey(record.id),
+        key: ValueKey(record.bookedDate),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         child: Container(
           decoration: BoxDecoration(
@@ -95,6 +95,6 @@ class _MyHomePageState extends State<TicketInformation> {
   }
 
   String getDescription(Book record) {
-    return "Source: ${record.source}\nDestination: ${record.destination}\nBooked Date: ${record.bookedDate}\nJourney Date: ${record.journeyDate}";
+    return "Source: ${record.source}\nDestination: ${record.destination}\nBooked Date: ${record.bookedDate.toString().substring(0, 16)}\nJourney Date: ${record.journeyDate.toString().substring(0, 16)}";
   }
 }

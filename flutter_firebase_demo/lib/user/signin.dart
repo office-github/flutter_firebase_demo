@@ -77,6 +77,7 @@ class _SignInState extends State<SignIn> {
           .getDocuments()
           .then((snapshot) {
         if (snapshot.documents.length > 0) {
+          back(context);
           CurrentUser.signIn(snapshot.documents[0]);
           redirectToPage();
         } else {
@@ -86,6 +87,7 @@ class _SignInState extends State<SignIn> {
               .getDocuments()
               .then((snapshot) {
             if (snapshot.documents.length > 0) {
+              back(context);
               CurrentUser.signIn(snapshot.documents[0]);
               redirectToPage();
             } else {
