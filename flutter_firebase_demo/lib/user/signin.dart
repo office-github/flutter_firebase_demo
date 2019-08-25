@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/back.dart';
+import 'package:flutter_firebase_demo/general/environment.dart';
 import 'package:flutter_firebase_demo/general/message_type.dart';
 import 'package:flutter_firebase_demo/menu/gridview_menu.dart';
 import 'package:flutter_firebase_demo/menu/normal_menu.dart';
@@ -21,6 +22,7 @@ class _SignInState extends State<SignIn> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController userNameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  String selectedEnvironment = Environment.demo;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +53,8 @@ class _SignInState extends State<SignIn> {
                 child: getPasswordTextField()),
             getSignInButton(),
             getForgotPasswordButton(),
-            getRegisterButton()
+            getRegisterButton(),
+            getEnvironmentDropDown()
           ],
         ),
       ),
@@ -66,47 +69,48 @@ class _SignInState extends State<SignIn> {
     debugPrint("Name: $userName, Password: $password");
 
 //Get the firebase database collection refrence of the baby collection.
-    /*CollectionReference reference = Firestore.instance.collection('User');
-    reference
-        .where("email", isEqualTo: userName.toLowerCase())
-        .where("password", isEqualTo: password)
-        .getDocuments()
-        .then((snapshot) {
-      if (snapshot.documents.length > 0) {
-        CurrentUser.signIn(snapshot.documents[0]);
-        redirectToPage();
-      } else {
-        reference
-            .where("phoneNo", isEqualTo: int.parse(userName))
-            .where("password", isEqualTo: password)
-            .getDocuments()
-            .then((snapshot) {
-          if (snapshot.documents.length > 0) {
-            CurrentUser.signIn(snapshot.documents[0]);
-            redirectToPage();
-          } else {
-            back(context);
-            showMessageDialog(
-                context: context,
-                title: "Sign In Error",
-                message: "Invalid User Name or Password",
-                type: MessageType.error);
-          }
-        });
-      }
-    }).catchError((e, s) {
-      print(e);
-      print(s);
-      back(context);
-      showMessageDialog(
-          context: context,
-          title: "Sign In Error",
-          message: "Error occured. Please try again later.",
-          type: MessageType.error);
-    });
-*/
-
-    redirectToPage();
+    if (this.selectedEnvironment == Environment.production) {
+      CollectionReference reference = Firestore.instance.collection('User');
+      reference
+          .where("email", isEqualTo: userName.toLowerCase())
+          .where("password", isEqualTo: password)
+          .getDocuments()
+          .then((snapshot) {
+        if (snapshot.documents.length > 0) {
+          CurrentUser.signIn(snapshot.documents[0]);
+          redirectToPage();
+        } else {
+          reference
+              .where("phoneNo", isEqualTo: int.parse(userName))
+              .where("password", isEqualTo: password)
+              .getDocuments()
+              .then((snapshot) {
+            if (snapshot.documents.length > 0) {
+              CurrentUser.signIn(snapshot.documents[0]);
+              redirectToPage();
+            } else {
+              back(context);
+              showMessageDialog(
+                  context: context,
+                  title: "Sign In Error",
+                  message: "Invalid User Name or Password",
+                  type: MessageType.error);
+            }
+          });
+        }
+      }).catchError((e, s) {
+        print(e);
+        print(s);
+        back(context);
+        showMessageDialog(
+            context: context,
+            title: "Sign In Error",
+            message: "Error occured. Please try again later.",
+            type: MessageType.error);
+      });
+    } else if (this.selectedEnvironment == Environment.demo) {
+      redirectToPage();
+    } else {}
   }
 
   redirectToPage() {
@@ -206,5 +210,32 @@ class _SignInState extends State<SignIn> {
         }));
       },
     );
+  }
+
+  getEnvironmentDropDown() {
+    final items = [
+      Environment.production,
+      Environment.staging,
+      Environment.demo
+    ];
+
+    return Container(
+        width: 100.0,
+        child: Center(
+          child: DropdownButton<String>(
+            items: items.map((item) {
+              return DropdownMenuItem(
+                value: item,
+                child: Text(item),
+              );
+            }).toList(),
+            onChanged: (envrionment) {
+              setState(() {
+                this.selectedEnvironment = envrionment;
+              });
+            },
+            value: this.selectedEnvironment,
+          ),
+        ));
   }
 }
