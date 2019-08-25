@@ -15,6 +15,7 @@ import 'package:flutter_firebase_demo/user/signin.dart';
 import 'package:flutter_firebase_demo/user/user_type.dart';
 import 'package:flutter_firebase_demo/user/register.dart';
 import 'package:flutter_firebase_demo/user/user_information.dart';
+import 'package:flutter_firebase_demo/user/wallet_insert.dart';
 
 class NormalMenu extends StatefulWidget {
   @override
@@ -82,7 +83,11 @@ class _NormalMenuState extends State<NormalMenu> {
           DrawerHeader(
             child: Row(
               children: <Widget>[
-                Text("Email: " + CurrentUser.email + "\nPhone No.: " + CurrentUser.phoneNo.toString() + "\n\nAmount Rs." +
+                Text("Email: " +
+                    CurrentUser.email +
+                    "\nPhone No.: " +
+                    CurrentUser.phoneNo.toString() +
+                    "\n\nAmount Rs." +
                     CurrentUser.amount.toString() +
                     "\nBonus Rs." +
                     CurrentUser.bonus.toString()),
@@ -177,7 +182,11 @@ class _NormalMenuState extends State<NormalMenu> {
         DrawerHeader(
           child: Row(
             children: <Widget>[
-              Text("Email: " + CurrentUser.email + "\nPhone No.: " + CurrentUser.phoneNo.toString() + "\n\nAmount Rs. : " +
+              Text("Email: " +
+                  CurrentUser.email +
+                  "\nPhone No.: " +
+                  CurrentUser.phoneNo.toString() +
+                  "\n\nAmount Rs. : " +
                   CurrentUser.amount.toString() +
                   "\nBonus Rs. : " +
                   CurrentUser.bonus.toString()),
@@ -216,6 +225,19 @@ class _NormalMenuState extends State<NormalMenu> {
         Divider(
           color: Theme.of(context).primaryColor,
         ),
+        ListTile(
+          title: Text('Add Money To Wallet'),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              debugPrint("Add Money To Wallet Navigation.");
+              return InsertWallet();
+            }));
+          },
+        ),
+        Divider(
+          color: Theme.of(context).primaryColor,
+        )
       ];
     } else {
       Navigator.of(context)

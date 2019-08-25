@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
             title: Text(record.fullName),
             trailing: Text(record.userType),
             subtitle:
-                Text("Email: ${record.email}\nPhone No.: ${record.phoneNo}"),
+                Text("Email: ${record.email}\nPhone No.: ${record.phoneNo}\nAmount: Rs.${record.amount}\nBonus: ${record.bonus}"),
             // onTap: () => Firestore.instance.runTransaction((transaction) async {
             //       final freshSnapshot = await transaction.get(record.reference);
             //       final fresh = Record.fromSnapshot(freshSnapshot);

@@ -109,15 +109,15 @@ class _SignInState extends State<SignIn> {
             type: MessageType.error);
       });
     } else if (this.selectedEnvironment == Environment.demo) {
+      back(context);
+      CurrentUser.signInForDemo(UserType.admin);
       redirectToPage();
     } else {}
   }
 
   redirectToPage() {
     passwordController.text = "";
-    back(context);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      CurrentUser.signInForDemo(UserType.admin);
       debugPrint("Signed In Successfully.");
       return NormalMenu();
       //return NormalMenu(userType: users.documents[0].data[UserType.text]);
