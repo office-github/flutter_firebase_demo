@@ -64,13 +64,13 @@ class _MyAppState extends State<QRReader> with SingleTickerProviderStateMixin {
     return new MaterialApp(
       home: new Scaffold(
         key: _scaffoldKey,
-        floatingActionButton: FloatingActionButton(
-          child: new Icon(Icons.check),
-          onPressed: () {
-            showInSnackBar(
-                "Just proving you can put anything on top of the scanner");
-          },
-        ),
+        // floatingActionButton: FloatingActionButton(
+        //   child: new Icon(Icons.check),
+        //   onPressed: () {
+        //     showInSnackBar(
+        //         "Just proving you can put anything on top of the scanner");
+        //   },
+        // ),
         body: Stack(
           children: <Widget>[
             new Container(
