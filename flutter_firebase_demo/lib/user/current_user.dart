@@ -21,6 +21,7 @@ class CurrentUser {
     isAuthenticated = true;
   }
 
+//For Firebase Server Code
   static signIn(DocumentSnapshot document) {
     id = document.data["id"];
     userType = document.data[UserType.text];

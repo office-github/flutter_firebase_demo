@@ -66,7 +66,7 @@ class _SignInState extends State<SignIn> {
     debugPrint("Name: $userName, Password: $password");
 
 //Get the firebase database collection refrence of the baby collection.
-    CollectionReference reference = Firestore.instance.collection('User');
+    /*CollectionReference reference = Firestore.instance.collection('User');
     reference
         .where("email", isEqualTo: userName.toLowerCase())
         .where("password", isEqualTo: password)
@@ -104,15 +104,16 @@ class _SignInState extends State<SignIn> {
           message: "Error occured. Please try again later.",
           type: MessageType.error);
     });
+*/
 
-    //CurrentUser.signInForDemo(UserType.admin);
-    //redirectToPage();
+    redirectToPage();
   }
 
   redirectToPage() {
     passwordController.text = "";
     back(context);
     Navigator.push(context, MaterialPageRoute(builder: (context) {
+      CurrentUser.signInForDemo(UserType.admin);
       debugPrint("Signed In Successfully.");
       return NormalMenu();
       //return NormalMenu(userType: users.documents[0].data[UserType.text]);

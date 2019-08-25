@@ -29,6 +29,7 @@ dependencies:
   fast_qr_reader_view: ^0.1.5
   flutter_typeahead: ^1.6.1
   uuid: 2.0.1
+  flutter_datetime_picker: ^1.2.6
 
 dev_dependencies:
   flutter_test:

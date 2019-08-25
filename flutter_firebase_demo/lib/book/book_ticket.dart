@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_firebase_demo/dialog/dialog.dart';
 import 'package:flutter_firebase_demo/general/message_type.dart';
 import 'package:flutter_firebase_demo/menu/normal_menu.dart';
@@ -25,6 +26,7 @@ class _BookState extends State<BookTicket> {
       TextEditingController();
   TextEditingController _destinationTypeAheadController =
       TextEditingController();
+  TextEditingController journeyDateController = TextEditingController();
   TextEditingController fairController = TextEditingController();
   TextEditingController discountController = TextEditingController();
   TextEditingController totalController = TextEditingController();
@@ -116,6 +118,8 @@ class _BookState extends State<BookTicket> {
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getSourceTypeAheadField()),
+            
+            getJourneyDateTime(),
             Padding(
                 padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                 child: getDestinationTypeAheadField()),
@@ -140,6 +144,7 @@ class _BookState extends State<BookTicket> {
                   setState(() {
                     if (_formKey.currentState.validate()) {
                       debugPrint("Pay Clicked");
+                      showCircularProgressBar(context);
                       payFair();
                     }
                   });
@@ -159,6 +164,8 @@ class _BookState extends State<BookTicket> {
     String busId = busInfoController.text;
     String source = _sourceTypeAheadController.text;
     String destination = _destinationTypeAheadController.text;
+    DateTime bookedDate = DateTime.now();
+    DateTime journeyDate = DateTime.parse(journeyDateController.text);
     double fair = double.parse(fairController.text);
     double discount = double.parse(discountController.text);
     double totalFair = double.parse(totalController.text);
@@ -180,6 +187,8 @@ class _BookState extends State<BookTicket> {
         "busId": busId,
         "source": source,
         "destination": destination,
+        "bookedDate": bookedDate,
+        "journeyDate": journeyDate,
         "fair": fair,
         "discount": discount,
         "totalFair": totalFair
@@ -207,22 +216,29 @@ class _BookState extends State<BookTicket> {
             {'amount': finalAmount, 'bonus': finalBonus});
       }
     }).whenComplete(() {
-    debugPrint("Saved Successfully.");
-    //back(context);
-    showMessageDialog(
-        context: context,
-        title: "Success",
-        message: "Ticket Booked Successfully",
-        type: MessageType.success);
+      debugPrint("Saved Successfully.");
+      back(context);
+      showMessageDialog(
+              context: context,
+              title: "Success",
+              message: "Paid Successfully",
+              type: MessageType.success)
+          .then((u) {
+        back(context);
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          debugPrint("Sign In Navigation.");
+          return NormalMenu();
+        }));
+      });
     }).catchError((e, s) {
       print(e);
       print(s);
-      //back(context);
-    showMessageDialog(
-        context: context,
-        title: "Failed",
-        message: "Ticked Booking Failed, Please Try again.",
-        type: MessageType.error);
+      back(context);
+      showMessageDialog(
+          context: context,
+          title: "Failed",
+          message: "Pay Failed, Please Try again.",
+          type: MessageType.error);
     });
   }
 
@@ -313,6 +329,30 @@ class _BookState extends State<BookTicket> {
       },
       onSaved: (value) => this._selectedCity = value,
     );
+  }
+
+  getJourneyDateTime() {
+    return GestureDetector(
+        onTap: () {
+          DatePicker.showDatePicker(context,
+              showTitleActions: true,
+              minTime: DateTime(2018, 3, 5), onChanged: (date) {
+            print('change $date');
+          }, onConfirm: (date) {
+            journeyDateController.text = date.toString().substring(0, 16);
+            print('confirm $date');
+          }, currentTime: DateTime.now(), locale: LocaleType.en);
+        },
+        child: AbsorbPointer(
+            child: TextFormField(
+          controller: journeyDateController,
+          decoration: InputDecoration(
+              labelText: "Journey Date",
+              hintText: "Please Enter Journey Date",
+              icon: Icon(Icons.date_range),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+        )));
   }
 
   getFairTextField() {
