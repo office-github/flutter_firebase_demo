@@ -36,7 +36,7 @@ class _MyHomePageState extends State<TicketInformation> {
 
   Widget _buildBody(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('Book').snapshots(),
+      stream: getStream(),
       builder: (context, snapshot) {
         if (!snapshot.hasData)
           return Center(child: CircularProgressIndicator());
@@ -65,7 +65,10 @@ class _MyHomePageState extends State<TicketInformation> {
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(5.0),
           ),
-          child: getTicketInformation(record),
+          child: ListTile(
+              title: Text("User ID: ${record.userId}, Bus ID: ${record.busId}"),
+              trailing: Text("Rs. ${record.totalFair}"),
+              subtitle: Text(getDescription(record))),
           // onTap: () => Firestore.instance.runTransaction((transaction) async {
           //       final freshSnapshot = await transaction.get(record.reference);
           //       final fresh = Record.fromSnapshot(freshSnapshot);
@@ -80,21 +83,18 @@ class _MyHomePageState extends State<TicketInformation> {
     }
   }
 
-  ListTile getTicketInformation(Book record) {
-    if (CurrentUser.userType == UserType.user) {
-      if (CurrentUser.email == record.userId) {
-        return ListTile(
-            title: Text("User ID: ${record.userId}, Bus ID: ${record.busId}"),
-            trailing: Text("Rs. ${record.totalFair}"),
-            subtitle: Text(
-                "Source: ${record.source}\nDestination: ${record.destination}"));
-      }
+  Stream<QuerySnapshot> getStream() {
+    if (CurrentUser.userType == UserType.admin) {
+      return Firestore.instance.collection('Book').snapshots();
+    } else {
+      return Firestore.instance
+          .collection('Book')
+          .where("userId", isEqualTo: CurrentUser.email)
+          .snapshots();
     }
+  }
 
-    return ListTile(
-        title: Text("User ID: ${record.userId}, Bus ID: ${record.busId}"),
-        trailing: Text("Rs. ${record.totalFair}"),
-        subtitle: Text(
-            "Source: ${record.source}\nDestination: ${record.destination}"));
+  String getDescription(Book record) {
+    return "Source: ${record.source}\nDestination: ${record.destination}\nBooked Date: ${record.bookedDate}\nJourney Date: ${record.journeyDate}";
   }
 }
