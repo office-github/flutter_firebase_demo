@@ -28,8 +28,8 @@ class _MyHomePageState extends State<RouteInformation> {
               },
             ),
           ),
-          //body: _buildBody(context),
-          body: Text("Route Information"),
+          body: _buildBody(context),
+          //body: Text("Route Information"),
         ));
   }
 

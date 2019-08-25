@@ -24,8 +24,8 @@ class User {
         email = map['email'],
         phoneNo = map['phoneNo'],
         password = map['password'],
-        bonus = double.parse(map['bonus'].toString()),
-        amount = double.parse(map['amount'].toString());
+        bonus = map['bonus'] == null ? 0.0 : double.parse(map['bonus'].toString()),
+        amount = map['bonus'] == null ? 0.0 : double.parse(map['amount'].toString());
 
   User.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);

@@ -20,8 +20,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //body: _buildBody(context),
-      body: Text("User Information"),
+      body: _buildBody(context),
+      //body: Text("User Information"),
     );
   }
 
